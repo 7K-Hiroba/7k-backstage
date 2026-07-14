@@ -35,6 +35,12 @@ export const keycloakOIDCAuthApiRef: ApiRef<
   id: 'auth.keycloak-oidc',
 });
 
+export const oidcAuthApiRef: ApiRef<
+  OpenIdConnectApi & ProfileInfoApi & BackstageIdentityApi & SessionApi
+> = createApiRef({
+  id: 'auth.oidc',
+});
+
 export const apis: AnyApiFactory[] = [
   createApiFactory({
     api: scmIntegrationsApiRef,
@@ -90,6 +96,26 @@ export const apis: AnyApiFactory[] = [
         provider: {
           id: 'keycloak-oidc',
           title: 'Keycloak OIDC',
+          icon: () => null,
+        },
+        environment: configApi.getOptionalString('auth.environment'),
+        defaultScopes: ['openid', 'profile', 'email', 'groups'],
+      }),
+  }),
+  createApiFactory({
+    api: oidcAuthApiRef,
+    deps: {
+      discoveryApi: discoveryApiRef,
+      oauthRequestApi: oauthRequestApiRef,
+      configApi: configApiRef,
+    },
+    factory: ({ discoveryApi, oauthRequestApi, configApi }) =>
+      OAuth2.create({
+        discoveryApi,
+        oauthRequestApi,
+        provider: {
+          id: 'oidc',
+          title: 'SSO',
           icon: () => null,
         },
         environment: configApi.getOptionalString('auth.environment'),

@@ -23,7 +23,7 @@ import {
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 import { UserSettingsPage } from '@backstage/plugin-user-settings';
-import { apis } from './apis';
+import { apis, oidcAuthApiRef } from './apis';
 import { entityPage } from './components/catalog/EntityPage';
 import { searchPage } from './components/search/SearchPage';
 import { Root } from './components/Root';
@@ -34,6 +34,7 @@ import {
 } from '@backstage/core-components';
 import { createApp } from '@backstage/app-defaults';
 import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
+import { configApiRef, useApi } from '@backstage/core-plugin-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
@@ -47,7 +48,21 @@ const app = createApp({
   themes: [cnoeVibrantLightAppTheme, cnoeVibrantDarkAppTheme],
   components: {
     SignInPage: props => {
-      return <SignInPage {...props} providers={['guest']} />;
+      const configApi = useApi(configApiRef);
+      if (configApi.getString('auth.environment') === 'local') {
+        return <SignInPage {...props} auto providers={['guest']} />;
+      }
+      return (
+        <SignInPage
+          {...props}
+          provider={{
+            id: 'oidc',
+            title: 'SSO',
+            message: 'Sign in using SSO',
+            apiRef: oidcAuthApiRef,
+          }}
+        />
+      );
     },
   },
   bindRoutes({ bind }) {

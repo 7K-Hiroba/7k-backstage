@@ -77,6 +77,11 @@ if (process.env.KEYCLOAK_URL) {
   backend.add(authModuleKeycloakOIDCProvider);
 }
 
+// Generic OIDC auth (any OIDC-compliant IdP)
+if (process.env.OIDC_METADATA_URL) {
+  backend.add(import('@backstage/plugin-auth-backend-module-oidc-provider'));
+}
+
 // Terraform backend
 if (process.env.MOCK_MODE !== 'true') {
   backend.add(import('@internal/backstage-plugin-terraform-backend'));
