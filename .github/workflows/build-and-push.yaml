@@ -8,10 +8,11 @@ on:
     tags: ['v*']
   workflow_dispatch:
 
-# Pushes to Harbor (harbor.7kgroup.org), public project 7khiroba.
-# Requires org/repo secrets: HARBOR_ROBOT_NAME, HARBOR_ROBOT_TOKEN.
+# Pushes to Harbor via the unproxied hostname (harbor.7kgroup.org is behind
+# Cloudflare, which rejects large layer uploads with 413).
+# Public project 7khiroba. Requires org secrets: HARBOR_ROBOT_NAME, HARBOR_ROBOT_TOKEN.
 env:
-  REGISTRY: harbor.7kgroup.org
+  REGISTRY: harbor-direct.7kgroup.org
   IMAGE_NAME: 7khiroba/backstage-app
 
 jobs:
