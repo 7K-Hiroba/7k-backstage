@@ -3932,9 +3932,7 @@
     "@backstage/types" "^1.1.1"
 
 "@backstage/config@^1.3.2", "@backstage/config@^1.3.4", "@backstage/config@^1.3.5", "@backstage/config@^1.3.6", "@backstage/config@^1.3.7":
-  version "1.3.7"
-  resolved "https://registry.yarnpkg.com/@backstage/config/-/config-1.3.7.tgz#7586019f369b9924ccd24e431948283f46afc987"
-  integrity sha512-vT2PE+R9Yt9i/nwtReKVtvXSB5vEdxwhtwHuIy5+TyDB8i9fBPdBN0pedy+iQsaTCXcDWcq/lLHaJ3t1nKc8MQ==
+  version "1.3.8"
   dependencies:
     "@backstage/errors" "^1.3.0"
     "@backstage/types" "^1.2.2"
