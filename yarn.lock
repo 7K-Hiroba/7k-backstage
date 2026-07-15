@@ -3360,9 +3360,7 @@
     undici "^7.24.5"
 
 "@backstage/cli-defaults@^0.1.0", "@backstage/cli-defaults@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@backstage/cli-defaults/-/cli-defaults-0.1.1.tgz#bac2c80830d23127a61877aedf764fc284534ce9"
-  integrity sha512-6ehdl1UthXsotp2VQA6KlCfweBdVNXuX73JLsC6wSOiG2E36tnnoGg2jHnrJrNju5+3oYvi/+qnEuvAvEO+B6A==
+  version "0.1.4"
   dependencies:
     "@backstage/cli-module-actions" "^0.1.0"
     "@backstage/cli-module-auth" "^0.1.1"
