@@ -52,7 +52,7 @@
     "@mui/icons-material": "^5.0.0",
     "@mui/material": "^9.0.0",
     "@roadiehq/backstage-plugin-argo-cd": "^2.12.5",
-    "@terasky/backstage-plugin-kro-resources-frontend": "^0.2.1",
+    "@terasky/backstage-plugin-kro-resources-frontend": "^0.16.1",
     "msw": "^1.0.0",
     "react": "^18.0.2",
     "react-dom": "^18.0.2",
