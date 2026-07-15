@@ -3273,9 +3273,7 @@
     zod "^3.25.76 || ^4.0.0"
 
 "@backstage/backend-test-utils@^1.11.1":
-  version "1.11.2"
-  resolved "https://registry.yarnpkg.com/@backstage/backend-test-utils/-/backend-test-utils-1.11.2.tgz#581f1c152e4e290e807d932ce21ea5e81892fbcd"
-  integrity sha512-TUMcYrgnyapBa9UBOE+h0kth0wlxr579Oi5824cMPvnTqmP16hdHOrw/bxC662LnG5PfL6ZZk3tE6QVaarTxIQ==
+  version "1.11.5"
   dependencies:
     "@backstage/backend-app-api" "^1.6.1"
     "@backstage/backend-defaults" "^0.17.0"
