@@ -6,7 +6,9 @@ import { cnoeScaffolderActions } from './modules/scaffolder';
 const backend = createBackend();
 
 // Detect if running inside a Kubernetes cluster
-const isInCluster = require('fs').existsSync('/var/run/secrets/kubernetes.io/serviceaccount/token');
+const isInCluster = require('fs').existsSync(
+  '/var/run/secrets/kubernetes.io/serviceaccount/token',
+);
 
 const k8sEnabled = process.env.K8S_CLUSTER_URL || isInCluster;
 
@@ -29,7 +31,6 @@ backend.add(
 if (process.env.GITHUB_TOKEN) {
   backend.add(import('@backstage/plugin-scaffolder-backend-module-github'));
 }
-backend.add(import('@backstage/plugin-scaffolder-backend-module-gitlab'));
 
 // CNOE custom scaffolder actions (gitea publish, argocd, k8s-apply, sanitize, verify)
 backend.add(cnoeScaffolderActions);
@@ -47,11 +48,6 @@ backend.add(import('@backstage/plugin-auth-backend-module-guest-provider'));
 
 // Catalog
 backend.add(import('@backstage/plugin-catalog-backend'));
-
-// Add GitLab integration for catalog processing
-if (process.env.GIT_HOSTNAME) {
-  backend.add(import('@backstage/plugin-catalog-backend-module-gitlab'));
-}
 
 // Permission
 backend.add(import('@backstage/plugin-permission-backend'));
@@ -84,11 +80,7 @@ if (process.env.OIDC_METADATA_URL) {
   backend.add(authModuleOidcProvider);
 }
 
-// Terraform backend
-if (process.env.MOCK_MODE !== 'true') {
-  backend.add(import('@internal/backstage-plugin-terraform-backend'));
-} else {
-  backend.add(import('./plugins/mock-terraform'));
+if (process.env.MOCK_MODE === 'true') {
   backend.add(import('./plugins/mock-argocd'));
 }
 

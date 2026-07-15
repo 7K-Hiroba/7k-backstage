@@ -14,6 +14,9 @@ on:
 
 jobs:
   promote:
+    permissions:
+      contents: read
+      id-token: write
     uses: 7K-Group/workflows-library/.github/workflows/promote.yml@v1
     with:
       image: backstage-app

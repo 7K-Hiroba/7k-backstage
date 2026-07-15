@@ -1,1 +1,0 @@
-export { MainPageComponent } from './MainPageComponent';

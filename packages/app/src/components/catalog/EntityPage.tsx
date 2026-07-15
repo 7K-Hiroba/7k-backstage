@@ -6,8 +6,6 @@ import AccountTree from '@mui/icons-material/AccountTree';
 import Api from '@mui/icons-material/Api';
 import Hub from '@mui/icons-material/Hub';
 import Description from '@mui/icons-material/Description';
-import Bolt from '@mui/icons-material/Bolt';
-import Storage from '@mui/icons-material/Storage';
 import Category from '@mui/icons-material/Category';
 import Schedule from '@mui/icons-material/Schedule';
 import Person from '@mui/icons-material/Person';
@@ -67,7 +65,10 @@ import {
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 
-import { EntityKubernetesContent, isKubernetesAvailable } from '@backstage/plugin-kubernetes';
+import {
+  EntityKubernetesContent,
+  isKubernetesAvailable,
+} from '@backstage/plugin-kubernetes';
 import {
   IfKroResourceGraphAvailable,
   IfKroOverviewAvailable,
@@ -81,14 +82,6 @@ import {
   EntityArgoWorkflowsTemplateOverviewCard,
   isArgoWorkflowsAvailable,
 } from '@internal/plugin-argo-workflows';
-import {
-  EntityApacheSparkContent,
-  isApacheSparkAvailable,
-} from '@internal/plugin-apache-spark';
-import {
-  EntityTerraformContent,
-  isTerraformAvailable,
-} from '@internal/plugin-terraform';
 import {
   EntityArgoCDOverviewCard,
   isArgocdAvailable,
@@ -138,7 +131,15 @@ const EntityMetadataBar = () => {
   }
 
   return (
-    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', padding: '12px 0', gridColumn: 'span 12' }}>
+    <div
+      style={{
+        display: 'flex',
+        gap: '8px',
+        flexWrap: 'wrap',
+        padding: '12px 0',
+        gridColumn: 'span 12',
+      }}
+    >
       <span style={{ ...chipBase, background: '#e3f2fd', color: '#1565c0' }}>
         <Category style={{ fontSize: 14 }} />
         {type}
@@ -242,9 +243,7 @@ const overviewContent = (
   </div>
 );
 
-const kubernetesContent = (
-  <EntityKubernetesContent />
-);
+const kubernetesContent = <EntityKubernetesContent />;
 
 const kroDetailsContent = (
   <div style={grid12}>
@@ -277,7 +276,10 @@ const serviceEntityPage = (
     <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
       {overviewContent}
     </EntityLayout.Route>
-    <EntityLayout.Route path="/ci-cd" title={tabLabel(<RocketLaunch />, 'CI/CD')}>
+    <EntityLayout.Route
+      path="/ci-cd"
+      title={tabLabel(<RocketLaunch />, 'CI/CD')}
+    >
       {cicdContent}
     </EntityLayout.Route>
     <EntityLayout.Route
@@ -287,7 +289,11 @@ const serviceEntityPage = (
     >
       {kubernetesContent}
     </EntityLayout.Route>
-    <EntityLayout.Route path="/kro" title={tabLabel(<AccountTree />, 'Kro Details')} if={isKroAvailable}>
+    <EntityLayout.Route
+      path="/kro"
+      title={tabLabel(<AccountTree />, 'Kro Details')}
+      if={isKroAvailable}
+    >
       {kroDetailsContent}
     </EntityLayout.Route>
     <EntityLayout.Route path="/api" title={tabLabel(<Api />, 'API')}>
@@ -300,25 +306,14 @@ const serviceEntityPage = (
         </div>
       </div>
     </EntityLayout.Route>
-    <EntityLayout.Route path="/dependencies" title={tabLabel(<Hub />, 'Dependencies')}>
+    <EntityLayout.Route
+      path="/dependencies"
+      title={tabLabel(<Hub />, 'Dependencies')}
+    >
       {dependenciesContent}
     </EntityLayout.Route>
     <EntityLayout.Route path="/docs" title={tabLabel(<Description />, 'Docs')}>
       {techdocsContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/apache-spark"
-      title={tabLabel(<Bolt />, 'Apache Spark')}
-      if={isApacheSparkAvailable}
-    >
-      <EntityApacheSparkContent />
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/terraform"
-      title={tabLabel(<Storage />, 'Terraform')}
-      if={isTerraformAvailable}
-    >
-      <EntityTerraformContent />
     </EntityLayout.Route>
   </EntityLayout>
 );
@@ -328,7 +323,10 @@ const websiteEntityPage = (
     <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
       {overviewContent}
     </EntityLayout.Route>
-    <EntityLayout.Route path="/ci-cd" title={tabLabel(<RocketLaunch />, 'CI/CD')}>
+    <EntityLayout.Route
+      path="/ci-cd"
+      title={tabLabel(<RocketLaunch />, 'CI/CD')}
+    >
       {cicdContent}
     </EntityLayout.Route>
     <EntityLayout.Route
@@ -338,28 +336,21 @@ const websiteEntityPage = (
     >
       {kubernetesContent}
     </EntityLayout.Route>
-    <EntityLayout.Route path="/kro" title={tabLabel(<AccountTree />, 'Kro Details')} if={isKroAvailable}>
+    <EntityLayout.Route
+      path="/kro"
+      title={tabLabel(<AccountTree />, 'Kro Details')}
+      if={isKroAvailable}
+    >
       {kroDetailsContent}
     </EntityLayout.Route>
-    <EntityLayout.Route path="/dependencies" title={tabLabel(<Hub />, 'Dependencies')}>
+    <EntityLayout.Route
+      path="/dependencies"
+      title={tabLabel(<Hub />, 'Dependencies')}
+    >
       {dependenciesContent}
     </EntityLayout.Route>
     <EntityLayout.Route path="/docs" title={tabLabel(<Description />, 'Docs')}>
       {techdocsContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/apache-spark"
-      title={tabLabel(<Bolt />, 'Apache Spark')}
-      if={isApacheSparkAvailable}
-    >
-      <EntityApacheSparkContent />
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/terraform"
-      title={tabLabel(<Storage />, 'Terraform')}
-      if={isTerraformAvailable}
-    >
-      <EntityTerraformContent />
     </EntityLayout.Route>
   </EntityLayout>
 );
@@ -385,7 +376,11 @@ const resourceGroupPage = (
         </div>
       </div>
     </EntityLayout.Route>
-    <EntityLayout.Route path="/kro" title={tabLabel(<AccountTree />, 'Kro Details')} if={isKroAvailable}>
+    <EntityLayout.Route
+      path="/kro"
+      title={tabLabel(<AccountTree />, 'Kro Details')}
+      if={isKroAvailable}
+    >
       {kroDetailsContent}
     </EntityLayout.Route>
     <EntityLayout.Route
@@ -395,7 +390,10 @@ const resourceGroupPage = (
     >
       <EntityKubernetesContent />
     </EntityLayout.Route>
-    <EntityLayout.Route path="/dependencies" title={tabLabel(<Hub />, 'Dependencies')}>
+    <EntityLayout.Route
+      path="/dependencies"
+      title={tabLabel(<Hub />, 'Dependencies')}
+    >
       {dependenciesContent}
     </EntityLayout.Route>
     <EntityLayout.Route path="/docs" title={tabLabel(<Description />, 'Docs')}>
@@ -449,7 +447,10 @@ const apiPage = (
         </div>
       </div>
     </EntityLayout.Route>
-    <EntityLayout.Route path="/definition" title={tabLabel(<Schema />, 'Definition')}>
+    <EntityLayout.Route
+      path="/definition"
+      title={tabLabel(<Schema />, 'Definition')}
+    >
       <div style={grid12}>
         <div style={span(12)}>
           <EntityApiDefinitionCard />
@@ -522,7 +523,10 @@ const systemPage = (
         </div>
       </div>
     </EntityLayout.Route>
-    <EntityLayout.Route path="/diagram" title={tabLabel(<GridView />, 'Diagram')}>
+    <EntityLayout.Route
+      path="/diagram"
+      title={tabLabel(<GridView />, 'Diagram')}
+    >
       <EntityCatalogGraphCard
         direction={Direction.TOP_BOTTOM}
         title="System Diagram"

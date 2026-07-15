@@ -27,7 +27,6 @@
     "@backstage/plugin-auth-backend-module-oidc-provider": "^0.4.14",
     "@backstage/plugin-auth-node": "^0.6.14",
     "@backstage/plugin-catalog-backend": "^3.5.0",
-    "@backstage/plugin-catalog-backend-module-gitlab": "^0.8.0",
     "@backstage/plugin-catalog-backend-module-scaffolder-entity-model": "^0.2.18",
     "@backstage/plugin-catalog-node": "^2.2.0",
     "@backstage/plugin-kubernetes-backend": "^0.21.2",
@@ -44,7 +43,6 @@
     "@backstage/plugin-search-backend-module-techdocs": "^0.4.12",
     "@backstage/plugin-techdocs-backend": "^2.1.6",
     "@backstage/types": "^1.2.2",
-    "@internal/backstage-plugin-terraform-backend": "^0.1.0",
     "@kubernetes/client-node": "~0.20.0",
     "@roadiehq/backstage-plugin-argo-cd-backend": "^4.7.1",
     "@roadiehq/scaffolder-backend-argocd": "^1.7.1",
@@ -59,8 +57,7 @@
     "fs-extra": "~11.2.0",
     "js-yaml": "^4.1.0",
     "node-gyp": "^10.0.0",
-    "yaml": "^2.3.0",
-    "@backstage/plugin-scaffolder-backend-module-gitlab": "^0.8.0"
+    "yaml": "^2.3.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "^1.11.1",

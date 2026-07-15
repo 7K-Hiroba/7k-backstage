@@ -3,16 +3,19 @@ name: CI
 on:
   pull_request:
     types: [opened, ready_for_review, synchronize]
-  push:
-    branches: [main]
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+permissions:
+  contents: read
+
 jobs:
   pr-title:
     if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: read
     uses: 7K-Group/workflows-library/.github/workflows/ci-lint-pr-title.yml@v1
 
   code:
@@ -72,6 +75,9 @@ jobs:
           if-no-files-found: ignore
 
   docker:
+    permissions:
+      contents: read
+      security-events: write
     uses: 7K-Group/workflows-library/.github/workflows/ci-app.yml@v1
     with:
       path: .

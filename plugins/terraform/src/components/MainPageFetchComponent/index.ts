@@ -1,1 +1,0 @@
-export { MainPageFetchComponent } from './MainPageFetchComponent';
