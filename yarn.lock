@@ -2823,9 +2823,7 @@
     react-use "^17.2.4"
 
 "@backstage/app-defaults@^1.7.6", "@backstage/app-defaults@^1.7.7":
-  version "1.7.7"
-  resolved "https://registry.yarnpkg.com/@backstage/app-defaults/-/app-defaults-1.7.7.tgz#a25e441704252db60124e11492b328628235339d"
-  integrity sha512-mhEqwgrxi8/twkzSx5gVPbMxScYXfy7cB2hv3kCUj5eEaNxGXDOSFasNH9XdosO/c7GYRlY2X1zD9/PGAV52zA==
+  version "1.7.10"
   dependencies:
     "@backstage/core-app-api" "^1.20.0"
     "@backstage/core-components" "^0.18.9"
