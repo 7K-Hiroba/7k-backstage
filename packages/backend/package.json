@@ -43,7 +43,7 @@
     "@backstage/plugin-search-backend-module-techdocs": "^0.4.16",
     "@backstage/plugin-techdocs-backend": "^2.2.2",
     "@backstage/types": "^1.2.2",
-    "@kubernetes/client-node": "~0.20.0",
+    "@kubernetes/client-node": "~0.22.0",
     "@roadiehq/backstage-plugin-argo-cd-backend": "^4.8.0",
     "@roadiehq/scaffolder-backend-argocd": "^1.8.1",
     "@roadiehq/scaffolder-backend-module-http-request": "^5.8.0",
