@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+  push:
+    branches: [main]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pr-title:
+    if: github.event_name == 'pull_request'
+    uses: 7K-Group/workflows-library/.github/workflows/ci-lint-pr-title.yml@v1
+
+  code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --network-timeout 600000
+
+      - name: Type check
+        run: yarn tsc
+
+      - name: Lint
+        run: yarn lint:all
+
+      - name: Test
+        run: yarn test:all
+        env:
+          CI: true
+
+      - name: Build backend
+        run: yarn build:backend
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --network-timeout 600000
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run e2e tests
+        run: yarn test:e2e
+
+      - uses: actions/upload-artifact@v5
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  docker:
+    uses: 7K-Group/workflows-library/.github/workflows/ci-app.yml@v1
+    with:
+      path: .
+      image-name: harbor.7kgroup.org/7khiroba/backstage-app

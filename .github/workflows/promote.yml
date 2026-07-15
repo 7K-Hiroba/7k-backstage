@@ -1,0 +1,22 @@
+name: Promote
+
+on:
+  workflow_dispatch:
+    inputs:
+      digest:
+        description: "Image digest to promote (sha256:...), built by the Release workflow"
+        required: true
+        type: string
+      tags:
+        description: "Comma-separated target tags (e.g. staging,prod)"
+        required: true
+        type: string
+
+jobs:
+  promote:
+    uses: 7K-Group/workflows-library/.github/workflows/promote.yml@v1
+    with:
+      image: backstage-app
+      digest: ${{ inputs.digest }}
+      tags: ${{ inputs.tags }}
+    secrets: inherit

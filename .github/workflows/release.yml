@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    uses: 7K-Group/workflows-library/.github/workflows/release-please.yml@v1
+    secrets: inherit
+
+  version:
+    needs: release-please
+    if: ${{ fromJson(needs.release-please.outputs.releases_created || '{}')['.'] }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.manifest.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Read version from manifest
+        id: manifest
+        run: echo "version=$(jq -r '.["."]' .release-please-manifest.json)" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: [release-please, version]
+    if: ${{ fromJson(needs.release-please.outputs.releases_created || '{}')['.'] }}
+    uses: 7K-Group/workflows-library/.github/workflows/release-app.yml@v1
+    with:
+      path: .
+      version: ${{ needs.version.outputs.version }}
+      image-name: backstage-app
+    secrets: inherit
+
+  latest:
+    needs: publish
+    uses: 7K-Group/workflows-library/.github/workflows/promote.yml@v1
+    with:
+      image: backstage-app
+      digest: ${{ needs.publish.outputs.digest }}
+      tags: latest
+      sign: false
+    secrets: inherit
