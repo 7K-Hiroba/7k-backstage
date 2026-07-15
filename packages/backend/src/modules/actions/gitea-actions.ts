@@ -120,7 +120,10 @@ const checkGiteaOrg = async (
     },
   };
   try {
-    response = await fetch(`${config.baseUrl}/api/v1/orgs/${owner}`, getOptions);
+    response = await fetch(
+      `${config.baseUrl}/api/v1/orgs/${owner}`,
+      getOptions,
+    );
   } catch (e) {
     throw new Error(`Unable to get the Organization: ${owner}, ${e}`);
   }
@@ -178,75 +181,66 @@ export function createPublishGiteaAction(options: {
 }) {
   const { integrations, config } = options;
 
-  return createTemplateAction<{
-    repoUrl: string;
-    description: string;
-    defaultBranch?: string;
-    gitCommitMessage?: string;
-    gitAuthorName?: string;
-    gitAuthorEmail?: string;
-    sourcePath?: string;
-  }>({
+  return createTemplateAction({
     id: 'publish:gitea',
     description:
       'Initializes a git repository using the content of the workspace, and publishes it to Gitea.',
     examples,
     schema: {
       input: {
-        type: 'object',
-        required: ['repoUrl'],
-        properties: {
-          repoUrl: { title: 'Repository Location', type: 'string' },
-          description: { title: 'Repository Description', type: 'string' },
-          defaultBranch: {
-            title: 'Default Branch',
-            type: 'string',
-            description: `Sets the default branch on the repository. The default value is 'main'`,
-          },
-          gitCommitMessage: {
-            title: 'Git Commit Message',
-            type: 'string',
-            description: `Sets the commit message on the repository. The default value is 'initial commit'`,
-          },
-          gitAuthorName: {
-            title: 'Default Author Name',
-            type: 'string',
-            description: `Sets the default author name for the commit. The default value is 'Scaffolder'`,
-          },
-          gitAuthorEmail: {
-            title: 'Default Author Email',
-            type: 'string',
-            description: `Sets the default author email for the commit.`,
-          },
-          sourcePath: {
-            title: 'Source Path',
-            type: 'string',
-            description: `Path within the workspace that will be used as the repository root.`,
-          },
-        },
+        repoUrl: z => z.string().describe('Repository Location'),
+        description: z =>
+          z.string().optional().describe('Repository Description'),
+        defaultBranch: z =>
+          z
+            .string()
+            .optional()
+            .describe(
+              `Sets the default branch on the repository. The default value is 'main'`,
+            ),
+        gitCommitMessage: z =>
+          z
+            .string()
+            .optional()
+            .describe(
+              `Sets the commit message on the repository. The default value is 'initial commit'`,
+            ),
+        gitAuthorName: z =>
+          z
+            .string()
+            .optional()
+            .describe(
+              `Sets the default author name for the commit. The default value is 'Scaffolder'`,
+            ),
+        gitAuthorEmail: z =>
+          z
+            .string()
+            .optional()
+            .describe(`Sets the default author email for the commit.`),
+        sourcePath: z =>
+          z
+            .string()
+            .optional()
+            .describe(
+              `Path within the workspace that will be used as the repository root.`,
+            ),
       },
       output: {
-        type: 'object',
-        properties: {
-          remoteUrl: {
-            title: 'A URL to the repository with the provider',
-            type: 'string',
-          },
-          repoContentsUrl: {
-            title: 'A URL to the root of the repository',
-            type: 'string',
-          },
-          commitHash: {
-            title: 'The git commit hash of the initial commit',
-            type: 'string',
-          },
-        },
+        remoteUrl: z =>
+          z.string().describe('A URL to the repository with the provider'),
+        repoContentsUrl: z =>
+          z.string().describe('A URL to the root of the repository'),
+        commitHash: z =>
+          z
+            .string()
+            .optional()
+            .describe('The git commit hash of the initial commit'),
       },
     },
     async handler(ctx) {
       const {
         repoUrl,
-        description,
+        description = '',
         defaultBranch = 'main',
         gitAuthorName,
         gitAuthorEmail,

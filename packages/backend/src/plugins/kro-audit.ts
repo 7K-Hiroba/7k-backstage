@@ -46,7 +46,7 @@ export interface KroAuditEvent {
  * Kro audit logger for ResourceGroup operations
  */
 export class KroAuditLogger {
-  constructor(private logger: any) { }
+  constructor(private logger: any) {}
 
   /**
    * Log ResourceGroup operation audit event
@@ -63,7 +63,7 @@ export class KroAuditLogger {
     action: string,
     result: 'success' | 'failure',
     details?: Record<string, any>,
-    error?: string
+    error?: string,
   ): void {
     const auditEvent: KroAuditEvent = {
       eventType,
@@ -98,7 +98,7 @@ export class KroAuditLogger {
       cluster?: string;
     },
     action: string,
-    reason?: string
+    reason?: string,
   ): void {
     this.logResourceGroupOperation(
       KroAuditEventType.PERMISSION_DENIED,
@@ -112,7 +112,7 @@ export class KroAuditLogger {
       action,
       'failure',
       { reason },
-      reason
+      reason,
     );
   }
 
@@ -128,7 +128,7 @@ export class KroAuditLogger {
       cluster?: string;
     },
     action: string,
-    error: string
+    error: string,
   ): void {
     this.logResourceGroupOperation(
       KroAuditEventType.AUTHENTICATION_FAILED,
@@ -142,7 +142,7 @@ export class KroAuditLogger {
       action,
       'failure',
       {},
-      error
+      error,
     );
   }
 
@@ -158,7 +158,7 @@ export class KroAuditLogger {
       cluster?: string;
     },
     action: string,
-    error: string
+    error: string,
   ): void {
     this.logResourceGroupOperation(
       KroAuditEventType.AUTHORIZATION_FAILED,
@@ -172,7 +172,7 @@ export class KroAuditLogger {
       action,
       'failure',
       {},
-      error
+      error,
     );
   }
 
@@ -189,7 +189,7 @@ export class KroAuditLogger {
       cluster?: string;
     },
     action: string,
-    details?: Record<string, any>
+    details?: Record<string, any>,
   ): void {
     this.logResourceGroupOperation(
       eventType,
@@ -197,7 +197,7 @@ export class KroAuditLogger {
       resource,
       action,
       'success',
-      details
+      details,
     );
   }
 }
@@ -219,7 +219,8 @@ export const kroAuditModule = createBackendModule({
 
         // Create audit logger instance
         // Initialize audit logger
-        const _auditLogger = new KroAuditLogger(logger);
+        // eslint-disable-next-line no-new
+        new KroAuditLogger(logger);
 
         // Register audit logger as a service (in a real implementation)
         // This would be made available to other parts of the application

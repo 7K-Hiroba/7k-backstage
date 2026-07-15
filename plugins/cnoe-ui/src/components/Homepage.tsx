@@ -11,9 +11,7 @@ import {
   TemplateBackstageLogoIcon,
 } from '@backstage/plugin-home';
 
-import {
-  LogoBig,
-} from './logos';
+import { LogoBig } from './logos';
 
 const getBasePath = () => {
   if (typeof window !== 'undefined') {
@@ -82,11 +80,22 @@ export const CNOEHomepage = () => {
         <Content>
           {/* CSS grid replaces MUI Grid (MUI removed per BUI migration) */}
           <div style={{ display: 'grid', justifyItems: 'center', gap: '48px' }}>
-            <HomePageCompanyLogo style={logoContainerStyle} logo={<LogoBig />} />
-            <div style={{ display: 'grid', width: '100%', alignItems: 'center' }}>
+            <div style={logoContainerStyle}>
+              <HomePageCompanyLogo logo={<LogoBig />} />
+            </div>
+            <div
+              style={{ display: 'grid', width: '100%', alignItems: 'center' }}
+            >
               <HomePageSearchBar style={searchBarStyle} placeholder="Search" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', width: '100%', gap: '16px' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                width: '100%',
+                gap: '16px',
+              }}
+            >
               <div>
                 <HomePageStarredEntities />
               </div>

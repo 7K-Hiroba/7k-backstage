@@ -1,9 +1,6 @@
 import type { CSSProperties } from 'react';
 import { Content, Page } from '@backstage/core-components';
-import {
-  CatalogIndexPage as StockCatalogIndexPage,
-  CatalogTable,
-} from '@backstage/plugin-catalog';
+import { CatalogTable } from '@backstage/plugin-catalog';
 import {
   EntityKindPicker,
   EntityListProvider,
@@ -37,7 +34,10 @@ export const CustomCatalogPage = () => (
     <Page themeId="home">
       <Content>
         <div style={contentWrapperStyle}>
-          <HeroHeader title="CNOE Catalog" subtitle="Discover and manage all your software components" />
+          <HeroHeader
+            title="CNOE Catalog"
+            subtitle="Discover and manage all your software components"
+          />
           <div className="cnoe-toolbar-card" style={toolbarCardStyle}>
             <div style={{ flex: 1 }}>
               <EntitySearchBar />

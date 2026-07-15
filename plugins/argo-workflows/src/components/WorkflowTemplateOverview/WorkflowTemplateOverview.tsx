@@ -1,11 +1,11 @@
-import { useEntity } from "@backstage/plugin-catalog-react";
-import { configApiRef, useApi } from "@backstage/core-plugin-api";
-import { argoWorkflowsApiRef } from "../../api";
-import { getAnnotationValues, trimBaseUrl } from "../utils";
-import { Link, Progress, Table, TableColumn } from "@backstage/core-components";
-import React, { useEffect, useState } from "react";
-import useAsync from "react-use/lib/useAsync";
-import { ResponseErrorPanel } from "@backstage/core-components";
+import { useEntity } from '@backstage/plugin-catalog-react';
+import { configApiRef, useApi } from '@backstage/core-plugin-api';
+import { argoWorkflowsApiRef } from '../../api';
+import { getAnnotationValues, trimBaseUrl } from '../utils';
+import { Link, Progress, Table, TableColumn } from '@backstage/core-components';
+import { useEffect, useState } from 'react';
+import useAsync from 'react-use/lib/useAsync';
+import { ResponseErrorPanel } from '@backstage/core-components';
 
 type TableData = {
   id: string;
@@ -19,15 +19,15 @@ export const WorkflowTemplateTable = () => {
   const apiClient = useApi(argoWorkflowsApiRef);
   const configApi = useApi(configApiRef);
   const argoWorkflowsBaseUrl = trimBaseUrl(
-    configApi.getOptionalString("argoWorkflows.baseUrl")
+    configApi.getOptionalString('argoWorkflows.baseUrl'),
   );
   const [columnData, setColumnData] = useState([] as TableData[]);
   const { ns, clusterName, labelSelector } = getAnnotationValues(entity);
 
   const columns: TableColumn[] = [
     {
-      title: "Name",
-      field: "name",
+      title: 'Name',
+      field: 'name',
       render: (data: any | TableData, _): any => {
         if (data && argoWorkflowsBaseUrl) {
           return (
@@ -40,10 +40,10 @@ export const WorkflowTemplateTable = () => {
         }
         return data.name;
       },
-      defaultSort: "desc",
+      defaultSort: 'desc',
     },
-    { title: "namespace", field: "namespace", type: "string" },
-    { title: "entrypoint", field: "entrypoint", type: "string" },
+    { title: 'namespace', field: 'namespace', type: 'string' },
+    { title: 'entrypoint', field: 'entrypoint', type: 'string' },
   ];
 
   const { value, loading, error } = useAsync(async () => {
@@ -51,7 +51,7 @@ export const WorkflowTemplateTable = () => {
   });
 
   useEffect(() => {
-    const data = value?.items?.map((val) => {
+    const data = value?.items?.map(val => {
       return {
         id: val.metadata.name,
         name: val.metadata.name,
@@ -73,7 +73,7 @@ export const WorkflowTemplateTable = () => {
   return (
     <Table
       options={{
-        padding: "dense",
+        padding: 'dense',
         paging: true,
         search: true,
         sorting: true,

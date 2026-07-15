@@ -1,8 +1,14 @@
 import { createBackendModule } from '@backstage/backend-plugin-api';
 import { coreServices } from '@backstage/backend-plugin-api';
-import { AuthorizeResult, PolicyDecision } from '@backstage/plugin-permission-common';
-import { PermissionPolicy, PolicyQuery } from '@backstage/plugin-permission-node';
-import { BackstageIdentityResponse } from '@backstage/plugin-auth-node';
+import {
+  AuthorizeResult,
+  PolicyDecision,
+} from '@backstage/plugin-permission-common';
+import {
+  PermissionPolicy,
+  PolicyQuery,
+  PolicyQueryUser,
+} from '@backstage/plugin-permission-node';
 
 /**
  * Kro-specific permissions for ResourceGroup operations
@@ -44,88 +50,91 @@ export const kroPermissions = {
 export class KroRBACValidator {
   constructor(
     private logger: any,
-    private kubernetesApi: any
-  ) { }
+    _kubernetesApi: any,
+  ) {}
 
   /**
    * Validate user permissions against Kubernetes RBAC for Kro operations
    */
   async validateKubernetesPermissions(
-    user: BackstageIdentityResponse,
+    user: PolicyQueryUser,
     action: string,
     resource: string,
     namespace?: string,
-    cluster?: string
+    cluster?: string,
   ): Promise<{ allowed: boolean; reason?: string }> {
     try {
-      this.logger.info(`Validating Kubernetes RBAC permissions for user: ${user.identity.userEntityRef}`, {
-        user: user.identity.userEntityRef,
-        action,
-        resource,
-        namespace,
-        cluster,
-        component: 'kro-permissions'
-      });
+      this.logger.info(
+        `Validating Kubernetes RBAC permissions for user: ${user.info.userEntityRef}`,
+        {
+          user: user.info.userEntityRef,
+          action,
+          resource,
+          namespace,
+          cluster,
+          component: 'kro-permissions',
+        },
+      );
 
       // For service account authentication, we assume the service account has proper permissions
       // In a real implementation, you would check the user's Kubernetes permissions
-      if ((user.identity as any).type === 'service') {
+      if ((user.info as any).type === 'service') {
         return { allowed: true };
       }
 
       // Simulate RBAC check - in a real implementation, this would call Kubernetes API
       // to check if the user has the required permissions
       const hasPermission = await this.checkKubernetesRBAC(
-        user.identity.userEntityRef,
+        user.info.userEntityRef,
         action,
         resource,
         namespace,
-        cluster
+        cluster,
       );
 
       if (!hasPermission) {
-        const reason = `User ${user.identity.userEntityRef} does not have permission to ${action} ${resource}${namespace ? ` in namespace ${namespace}` : ''}${cluster ? ` on cluster ${cluster}` : ''}`;
+        const reason = `User ${user.info.userEntityRef} does not have permission to ${action} ${resource}${namespace ? ` in namespace ${namespace}` : ''}${cluster ? ` on cluster ${cluster}` : ''}`;
 
         this.logger.warn(`Kubernetes RBAC validation failed`, {
-          user: user.identity.userEntityRef,
+          user: user.info.userEntityRef,
           action,
           resource,
           namespace,
           cluster,
           reason,
-          component: 'kro-permissions'
+          component: 'kro-permissions',
         });
 
         return { allowed: false, reason };
       }
 
       this.logger.info(`Kubernetes RBAC validation successful`, {
-        user: user.identity.userEntityRef,
+        user: user.info.userEntityRef,
         action,
         resource,
         namespace,
         cluster,
-        component: 'kro-permissions'
+        component: 'kro-permissions',
       });
 
       return { allowed: true };
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Error validating Kubernetes RBAC permissions`, {
-        user: user.identity.userEntityRef,
+        user: user.info.userEntityRef,
         action,
         resource,
         namespace,
         cluster,
         error: errorMessage,
-        component: 'kro-permissions'
+        component: 'kro-permissions',
       });
 
       return {
         allowed: false,
-        reason: `Permission validation failed: ${errorMessage}`
+        reason: `Permission validation failed: ${errorMessage}`,
       };
     }
   }
@@ -138,7 +147,7 @@ export class KroRBACValidator {
     action: string,
     resource: string,
     namespace?: string,
-    cluster?: string
+    cluster?: string,
   ): Promise<boolean> {
     try {
       // In a real implementation, this would create a SubjectAccessReview
@@ -154,25 +163,25 @@ export class KroRBACValidator {
       // Define permission mappings (this would typically come from Kubernetes RBAC)
       const permissionMappings = {
         'kro.run/v1alpha1/resourcegraphdefinitions': {
-          'get': ['kro-readers', 'kro-admins', 'platform-engineers'],
-          'list': ['kro-readers', 'kro-admins', 'platform-engineers'],
-          'create': ['kro-admins', 'platform-engineers'],
-          'update': ['kro-admins', 'platform-engineers'],
-          'delete': ['kro-admins', 'platform-engineers'],
+          get: ['kro-readers', 'kro-admins', 'platform-engineers'],
+          list: ['kro-readers', 'kro-admins', 'platform-engineers'],
+          create: ['kro-admins', 'platform-engineers'],
+          update: ['kro-admins', 'platform-engineers'],
+          delete: ['kro-admins', 'platform-engineers'],
         },
         'kro.run/v1alpha1/cicdpipelines': {
-          'get': ['kro-readers', 'kro-admins', 'developers'],
-          'list': ['kro-readers', 'kro-admins', 'developers'],
-          'create': ['kro-admins', 'developers'],
-          'update': ['kro-admins', 'developers'],
-          'delete': ['kro-admins'],
+          get: ['kro-readers', 'kro-admins', 'developers'],
+          list: ['kro-readers', 'kro-admins', 'developers'],
+          create: ['kro-admins', 'developers'],
+          update: ['kro-admins', 'developers'],
+          delete: ['kro-admins'],
         },
         'kro.run/v1alpha1/eksclusters': {
-          'get': ['kro-readers', 'kro-admins', 'platform-engineers'],
-          'list': ['kro-readers', 'kro-admins', 'platform-engineers'],
-          'create': ['kro-admins', 'platform-engineers'],
-          'update': ['kro-admins', 'platform-engineers'],
-          'delete': ['kro-admins', 'platform-engineers'],
+          get: ['kro-readers', 'kro-admins', 'platform-engineers'],
+          list: ['kro-readers', 'kro-admins', 'platform-engineers'],
+          create: ['kro-admins', 'platform-engineers'],
+          update: ['kro-admins', 'platform-engineers'],
+          delete: ['kro-admins', 'platform-engineers'],
         },
       };
 
@@ -193,10 +202,11 @@ export class KroRBACValidator {
       }
 
       // Check if user belongs to any of the allowed groups
-      const hasPermission = userGroups.some(group => allowedGroups.includes(group));
+      const hasPermission = userGroups.some(group =>
+        allowedGroups.includes(group),
+      );
 
       return hasPermission;
-
     } catch (error) {
       this.logger.error(`Error checking Kubernetes RBAC`, {
         userRef,
@@ -205,7 +215,7 @@ export class KroRBACValidator {
         namespace,
         cluster,
         error: error instanceof Error ? error.message : String(error),
-        component: 'kro-permissions'
+        component: 'kro-permissions',
       });
       return false;
     }
@@ -235,10 +245,13 @@ export class KroRBACValidator {
 export class KroPermissionPolicy implements PermissionPolicy {
   constructor(
     private rbacValidator: KroRBACValidator,
-    private logger: any
-  ) { }
+    private logger: any,
+  ) {}
 
-  async handle(request: PolicyQuery, user?: BackstageIdentityResponse): Promise<PolicyDecision> {
+  async handle(
+    request: PolicyQuery,
+    user?: PolicyQueryUser,
+  ): Promise<PolicyDecision> {
     try {
       // Check if this is a Kro-related permission
       if (!request.permission.name.startsWith('kro.')) {
@@ -246,7 +259,9 @@ export class KroPermissionPolicy implements PermissionPolicy {
       }
 
       if (!user) {
-        this.logger.warn(`Permission denied: No user context provided for ${request.permission.name}`);
+        this.logger.warn(
+          `Permission denied: No user context provided for ${request.permission.name}`,
+        );
         return { result: AuthorizeResult.DENY };
       }
 
@@ -290,33 +305,33 @@ export class KroPermissionPolicy implements PermissionPolicy {
         kubernetesVerb,
         kubernetesResource,
         (request as any).resourceRef?.namespace,
-        (request as any).resourceRef?.cluster
+        (request as any).resourceRef?.cluster,
       );
 
       if (validation.allowed) {
         this.logger.info(`Permission granted for ${request.permission.name}`, {
-          user: user.identity.userEntityRef,
+          user: user.info.userEntityRef,
           permission: request.permission.name,
-          component: 'kro-permissions'
+          component: 'kro-permissions',
         });
         return { result: AuthorizeResult.ALLOW };
       }
       this.logger.warn(`Permission denied for ${request.permission.name}`, {
-        user: user.identity.userEntityRef,
+        user: user.info.userEntityRef,
         permission: request.permission.name,
         reason: validation.reason,
-        component: 'kro-permissions'
+        component: 'kro-permissions',
       });
       return { result: AuthorizeResult.DENY };
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       this.logger.error(`Error evaluating permission policy`, {
         permission: request.permission.name,
-        user: user?.identity.userEntityRef,
+        user: user?.info.userEntityRef,
         error: errorMessage,
-        component: 'kro-permissions'
+        component: 'kro-permissions',
       });
 
       // Deny by default on error
@@ -346,7 +361,8 @@ export const kroPermissionsModule = createBackendModule({
 
         // Create and register permission policy
         // Initialize kro policy
-        const _kroPolicy = new KroPermissionPolicy(rbacValidator, logger);
+        // eslint-disable-next-line no-new
+        new KroPermissionPolicy(rbacValidator, logger);
 
         // Note: In a real implementation, you would register this policy with the permission system
         // This is a simplified example showing the structure

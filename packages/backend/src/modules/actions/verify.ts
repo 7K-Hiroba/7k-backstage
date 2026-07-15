@@ -18,22 +18,11 @@ class ConsoleLogStream extends Writable {
 }
 
 export const createVerifyDependency = () => {
-  return createTemplateAction<{
-    verifiers: string[];
-  }>({
+  return createTemplateAction({
     id: 'cnoe:verify:dependency',
     schema: {
       input: {
-        type: 'object',
-        required: ['verifiers'],
-        properties: {
-          verifiers: {
-            type: 'array',
-            items: { type: 'string' },
-            title: 'verifiers',
-            description: 'The list of verifiers',
-          },
-        },
+        verifiers: z => z.array(z.string()).describe('The list of verifiers'),
       },
     },
     async handler(ctx) {

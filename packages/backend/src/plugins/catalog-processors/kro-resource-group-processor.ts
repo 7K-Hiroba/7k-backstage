@@ -11,7 +11,7 @@ export class KroResourceGroupProcessor implements CatalogProcessor {
   private kubernetesClient: any;
 
   constructor(
-    private config: Config,
+    _config: Config,
     private logger: any,
   ) {
     this.initializeKubernetesClient();
@@ -51,16 +51,25 @@ export class KroResourceGroupProcessor implements CatalogProcessor {
     try {
       this.logger.info('Processing ResourceGraphDefinitions', { cluster });
 
-      const rgds = await this.kubernetesClient.listResourceGraphDefinitions(cluster);
+      const rgds =
+        await this.kubernetesClient.listResourceGraphDefinitions(cluster);
 
       for (const rgd of rgds) {
         try {
-          const entity = this.transformResourceGraphDefinitionToEntity(rgd, cluster);
+          const entity = this.transformResourceGraphDefinitionToEntity(
+            rgd,
+            cluster,
+          );
           if (entity) {
-            emit(processingResult.entity({
-              type: 'kro-resource-graph-definitions',
-              target: cluster,
-            }, entity));
+            emit(
+              processingResult.entity(
+                {
+                  type: 'kro-resource-graph-definitions',
+                  target: cluster,
+                },
+                entity,
+              ),
+            );
           }
         } catch (error) {
           this.logger.warn('Skipping malformed ResourceGraphDefinition', {
@@ -93,16 +102,22 @@ export class KroResourceGroupProcessor implements CatalogProcessor {
     try {
       this.logger.info('Processing ResourceGroups', { cluster });
 
-      const resourceGroups = await this.kubernetesClient.listResourceGroups(cluster);
+      const resourceGroups =
+        await this.kubernetesClient.listResourceGroups(cluster);
 
       for (const rg of resourceGroups) {
         try {
           const entity = this.transformResourceGroupToEntity(rg, cluster);
           if (entity) {
-            emit(processingResult.entity({
-              type: 'kro-resource-groups',
-              target: cluster,
-            }, entity));
+            emit(
+              processingResult.entity(
+                {
+                  type: 'kro-resource-groups',
+                  target: cluster,
+                },
+                entity,
+              ),
+            );
           }
         } catch (error) {
           this.logger.warn('Skipping malformed ResourceGroup', {
@@ -120,7 +135,10 @@ export class KroResourceGroupProcessor implements CatalogProcessor {
     }
   }
 
-  private transformResourceGraphDefinitionToEntity(rgd: any, cluster: string): Entity | null {
+  private transformResourceGraphDefinitionToEntity(
+    rgd: any,
+    cluster: string,
+  ): Entity | null {
     if (!rgd.metadata?.name) {
       throw new Error('ResourceGraphDefinition missing required name');
     }
@@ -180,7 +198,10 @@ export class KroResourceGroupProcessor implements CatalogProcessor {
     return entity;
   }
 
-  private transformResourceGroupToEntity(rg: any, cluster: string): Entity | null {
+  private transformResourceGroupToEntity(
+    rg: any,
+    cluster: string,
+  ): Entity | null {
     if (!rg.metadata?.name) {
       throw new Error('ResourceGroup missing required name');
     }
@@ -199,7 +220,8 @@ export class KroResourceGroupProcessor implements CatalogProcessor {
     }
 
     // Determine owner from annotations
-    const owner = annotations['backstage.io/owner'] ||
+    const owner =
+      annotations['backstage.io/owner'] ||
       annotations['kro.run/created-by'] ||
       'platform-team';
 
@@ -280,11 +302,16 @@ export class KroResourceGroupProcessor implements CatalogProcessor {
     }
 
     // Determine phase from conditions
-    const readyCondition = status.conditions?.find((c: any) => c.type === 'Ready');
+    const readyCondition = status.conditions?.find(
+      (c: any) => c.type === 'Ready',
+    );
     if (readyCondition) {
       if (readyCondition.status === 'True') {
         return 'Ready';
-      } else if (readyCondition.reason === 'Failed' || readyCondition.status === 'False') {
+      } else if (
+        readyCondition.reason === 'Failed' ||
+        readyCondition.status === 'False'
+      ) {
         return 'Failed';
       }
       return 'Pending';
@@ -295,7 +322,9 @@ export class KroResourceGroupProcessor implements CatalogProcessor {
 }
 
 // Helper function to create location for ResourceGraphDefinitions
-export function createResourceGraphDefinitionLocation(cluster: string): LocationSpec {
+export function createResourceGraphDefinitionLocation(
+  cluster: string,
+): LocationSpec {
   return {
     type: 'kro-resource-graph-definitions',
     target: cluster,

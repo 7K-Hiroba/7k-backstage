@@ -22,18 +22,13 @@ export const kubernetesKroIntegrationModule = createBackendModule({
         const kubernetesConfig = config.getOptionalConfig('kubernetes');
 
         if (!kubernetesConfig) {
-          logger.warn('Kubernetes configuration not found. Kro integration will be limited.');
+          logger.warn(
+            'Kubernetes configuration not found. Kro integration will be limited.',
+          );
           return;
         }
 
         // Enhance Kubernetes plugin with Kro resource types
-        const clusterConfig = kubernetesConfig.getOptionalConfigArray('clusterLocatorMethods')
-          ?.find(method => method.getString('type') === 'config')
-          ?.getOptionalConfigArray('clusters')
-          ?.find(() => true); // Get first cluster config
-        
-        const customResources = clusterConfig?.getOptionalConfigArray('customResources') || [];
-
         const kroResourceTypes = [
           {
             group: 'kro.run',
@@ -62,15 +57,25 @@ export const kubernetesKroIntegrationModule = createBackendModule({
           },
         ];
 
-        logger.info(`Registered ${kroResourceTypes.length} Kro resource types for Kubernetes plugin discovery`, {
-          resourceTypes: kroResourceTypes.map(rt => `${rt.group}/${rt.apiVersion}/${rt.plural}`),
-        });
+        logger.info(
+          `Registered ${kroResourceTypes.length} Kro resource types for Kubernetes plugin discovery`,
+          {
+            resourceTypes: kroResourceTypes.map(
+              rt => `${rt.group}/${rt.apiVersion}/${rt.plural}`,
+            ),
+          },
+        );
 
         // Log integration status
         if (kroConfig) {
           const integrationConfig = kroConfig.getOptionalConfig('integration');
-          const showInKubernetesViews = integrationConfig?.getOptionalBoolean('showInKubernetesViews') ?? true;
-          const enableRelationshipMapping = integrationConfig?.getOptionalBoolean('enableRelationshipMapping') ?? true;
+          const showInKubernetesViews =
+            integrationConfig?.getOptionalBoolean('showInKubernetesViews') ??
+            true;
+          const enableRelationshipMapping =
+            integrationConfig?.getOptionalBoolean(
+              'enableRelationshipMapping',
+            ) ?? true;
 
           logger.info('Kro-Kubernetes integration configured', {
             showInKubernetesViews,
@@ -78,7 +83,9 @@ export const kubernetesKroIntegrationModule = createBackendModule({
           });
         }
 
-        logger.info('Kubernetes-Kro integration module initialized successfully');
+        logger.info(
+          'Kubernetes-Kro integration module initialized successfully',
+        );
       },
     });
   },
@@ -88,7 +95,7 @@ export const kubernetesKroIntegrationModule = createBackendModule({
  * Resource relationship mapper for Kro ResourceGroups
  */
 export class KroResourceRelationshipMapper {
-  constructor(private logger: any) { }
+  constructor(private logger: any) {}
 
   /**
    * Map relationships between ResourceGroups and their managed resources
@@ -98,9 +105,10 @@ export class KroResourceRelationshipMapper {
 
     try {
       // Find ResourceGroups and their managed resources
-      const resourceGroups = resources.filter(r =>
-        r.metadata?.labels?.['kro.run/resource-type'] === 'ResourceGroup' ||
-        r.kind === 'ResourceGraphDefinition'
+      const resourceGroups = resources.filter(
+        r =>
+          r.metadata?.labels?.['kro.run/resource-type'] === 'ResourceGroup' ||
+          r.kind === 'ResourceGraphDefinition',
       );
 
       resourceGroups.forEach(rg => {
@@ -119,7 +127,8 @@ export class KroResourceRelationshipMapper {
 
         // Look for resources with Kro annotations
         resources.forEach(resource => {
-          const kroResourceGroup = resource.metadata?.annotations?.['kro.run/resource-group'];
+          const kroResourceGroup =
+            resource.metadata?.annotations?.['kro.run/resource-group'];
           if (kroResourceGroup === rg.metadata.name) {
             const resourceKey = `${resource.metadata.namespace}/${resource.metadata.name}`;
             managedResources.push(resourceKey);
@@ -128,15 +137,20 @@ export class KroResourceRelationshipMapper {
 
         if (managedResources.length > 0) {
           relationships.set(rgKey, managedResources);
-          this.logger.debug(`Mapped ResourceGroup ${rgKey} to ${managedResources.length} managed resources`);
+          this.logger.debug(
+            `Mapped ResourceGroup ${rgKey} to ${managedResources.length} managed resources`,
+          );
         }
       });
 
-      this.logger.info(`Mapped relationships for ${relationships.size} ResourceGroups`);
+      this.logger.info(
+        `Mapped relationships for ${relationships.size} ResourceGroups`,
+      );
       return relationships;
-
     } catch (error) {
-      this.logger.error('Failed to map Kro resource relationships', { error: (error as Error).message });
+      this.logger.error('Failed to map Kro resource relationships', {
+        error: (error as Error).message,
+      });
       return new Map();
     }
   }
@@ -144,7 +158,10 @@ export class KroResourceRelationshipMapper {
   /**
    * Enhance resource objects with relationship metadata
    */
-  enhanceResourcesWithRelationships(resources: any[], relationships: Map<string, string[]>): any[] {
+  enhanceResourcesWithRelationships(
+    resources: any[],
+    relationships: Map<string, string[]>,
+  ): any[] {
     return resources.map(resource => {
       const resourceKey = `${resource.metadata.namespace}/${resource.metadata.name}`;
 
@@ -157,7 +174,7 @@ export class KroResourceRelationshipMapper {
             managedResources.map(mr => {
               const [namespace, name] = mr.split('/');
               return { namespace, name };
-            })
+            }),
           ),
         };
       }
@@ -197,14 +214,19 @@ export class KroResourceFilter {
    */
   isKroResource(resource: any): boolean {
     const resourceType = `${resource.apiVersion}/${resource.kind}`;
-    return this.kroResourceTypes.has(resourceType) ||
-      Boolean(resource.metadata?.labels?.['kro.run/resource-type']);
+    return (
+      this.kroResourceTypes.has(resourceType) ||
+      Boolean(resource.metadata?.labels?.['kro.run/resource-type'])
+    );
   }
 
   /**
    * Filter resources to include/exclude Kro resources based on configuration
    */
-  filterResources(resources: any[], includeKroResources: boolean = true): any[] {
+  filterResources(
+    resources: any[],
+    includeKroResources: boolean = true,
+  ): any[] {
     if (includeKroResources) {
       return resources; // Include all resources
     }

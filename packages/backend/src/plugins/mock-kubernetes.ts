@@ -78,7 +78,8 @@ export default createBackendPlugin({
 
         // Mock proxy endpoint — handles all kubernetes API proxy requests
         router.all('/proxy/*', (req, res) => {
-          const proxyPath = req.params[0] || req.path;
+          const proxyPath =
+            (req.params as Record<string, string>)[0] || req.path;
 
           // Pod logs
           if (proxyPath.includes('/log')) {

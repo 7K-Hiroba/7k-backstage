@@ -10,53 +10,30 @@ export function createArgoCDApp(options: {
 }) {
   const { config, logger } = options;
 
-  return createTemplateAction<{
-    repoUrl: string;
-    projectName?: string;
-    appName: string;
-    argoInstance: string;
-    path: string;
-    labelValue?: string;
-    appNamespace: string;
-  }>({
+  return createTemplateAction({
     id: 'cnoe:create-argocd-app',
     description: 'creates argocd app',
     examples,
     schema: {
       input: {
-        type: 'object',
-        required: [
-          'repoUrl',
-          'projectName',
-          'appName',
-          'argoInstance',
-          'path',
-          'appNamespace',
-        ],
-        properties: {
-          repoUrl: { title: 'Repository Location', type: 'string' },
-          projectName: {
-            title: 'name of the project in argocd',
-            type: 'string',
-          },
-          appName: { title: 'application name in argocd', type: 'string' },
-          appNamespace: {
-            title: 'application namespace in argocd',
-            type: 'string',
-          },
-          argoInstance: {
-            title:
+        repoUrl: z => z.string().describe('Repository Location'),
+        projectName: z => z.string().describe('name of the project in argocd'),
+        appName: z => z.string().describe('application name in argocd'),
+        appNamespace: z =>
+          z.string().describe('application namespace in argocd'),
+        argoInstance: z =>
+          z
+            .string()
+            .describe(
               'backstage argocd instance name defined in app-config.yaml',
-            type: 'string',
-          },
-          path: { title: 'argocd spec path', type: 'string' },
-          labelValue: {
-            title: 'for argocd plugin to locate this app',
-            type: 'string',
-          },
-        },
+            ),
+        path: z => z.string().describe('argocd spec path'),
+        labelValue: z =>
+          z
+            .string()
+            .optional()
+            .describe('for argocd plugin to locate this app'),
       },
-      output: {},
     },
     async handler(ctx) {
       const {
@@ -101,9 +78,7 @@ export function createArgoCDApp(options: {
         argoHost => argoHost.name === argoInstance,
       );
       if (!matchedArgoInstance) {
-        throw new Error(
-          `Unable to find Argo instance named "${argoInstance}"`,
-        );
+        throw new Error(`Unable to find Argo instance named "${argoInstance}"`);
       }
       const token =
         matchedArgoInstance.token ||

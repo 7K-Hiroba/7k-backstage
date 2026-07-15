@@ -34,57 +34,37 @@ interface ConfFile {
   users: User[];
 }
 
-export const createKubernetesApply = (config: Config, actionId = 'cnoe:kubernetes:apply') => {
-  return createTemplateAction<{
-    manifestString?: string;
-    manifestObject?: any;
-    manifestPath?: string;
-    manifest?: string;
-    namespaced: boolean;
-    clusterName?: string;
-  }>({
+export const createKubernetesApply = (
+  config: Config,
+  actionId = 'cnoe:kubernetes:apply',
+) => {
+  return createTemplateAction({
     id: actionId,
     schema: {
       input: {
-        type: 'object',
-        required: ['namespaced'],
-        properties: {
-          manifestString: {
-            type: 'string',
-            title: 'Manifest',
-            description: 'The manifest to apply in the cluster. Must be a string',
-          },
-          manifest: {
-            type: 'string',
-            title: 'Manifest',
-            description: 'Alias for manifestString',
-          },
-          manifestObject: {
-            type: 'object',
-            title: 'Manifest',
-            description: 'The manifest to apply in the cluster. Must be an object',
-          },
-          manifestPath: {
-            type: 'string',
-            title: 'Path to the manifest file',
-            description: 'The path to the manifest file.',
-          },
-          namespaced: {
-            type: 'boolean',
-            title: 'Namespaced',
-            description: 'Whether the API is namespaced or not',
-          },
-          clusterName: {
-            type: 'string',
-            title: 'Cluster Name',
-            description: 'The name of the cluster to apply this',
-          },
-        },
-      },
-      output: {
-        type: 'object',
-        title: 'Returned object',
-        description: 'The object returned by Kubernetes by performing this operation',
+        manifestString: z =>
+          z
+            .string()
+            .optional()
+            .describe('The manifest to apply in the cluster. Must be a string'),
+        manifest: z =>
+          z.string().optional().describe('Alias for manifestString'),
+        manifestObject: z =>
+          z
+            .record(z.any())
+            .optional()
+            .describe(
+              'The manifest to apply in the cluster. Must be an object',
+            ),
+        manifestPath: z =>
+          z.string().optional().describe('The path to the manifest file.'),
+        namespaced: z =>
+          z.boolean().describe('Whether the API is namespaced or not'),
+        clusterName: z =>
+          z
+            .string()
+            .optional()
+            .describe('The name of the cluster to apply this'),
       },
     },
     async handler(ctx) {
@@ -93,10 +73,14 @@ export const createKubernetesApply = (config: Config, actionId = 'cnoe:kubernete
         'to-be-applied.yaml',
       );
       if (ctx.input.manifestString || ctx.input.manifest) {
-        fs.writeFileSync(manifestPath, ctx.input.manifestString || ctx.input.manifest!, {
-          encoding: 'utf8',
-          mode: '600',
-        });
+        fs.writeFileSync(
+          manifestPath,
+          ctx.input.manifestString || ctx.input.manifest!,
+          {
+            encoding: 'utf8',
+            mode: '600',
+          },
+        );
       } else if (ctx.input.manifestObject) {
         fs.writeFileSync(manifestPath, yaml.dump(ctx.input.manifestObject), {
           encoding: 'utf8',
@@ -153,7 +137,8 @@ export const createKubernetesApply = (config: Config, actionId = 'cnoe:kubernete
               'utf8',
             ).toString('base64');
           }
-          confFile.clusters[0].cluster['certificate-authority-data'] = caDataRaw;
+          confFile.clusters[0].cluster['certificate-authority-data'] =
+            caDataRaw;
           if (
             targetCluster.getOptionalString('caFile') &&
             !(
@@ -186,14 +171,26 @@ export const createKubernetesApply = (config: Config, actionId = 'cnoe:kubernete
           if (obj.metadata.generateName !== undefined) {
             await executeShellCommand({
               command: 'kubectl',
-              args: ['--kubeconfig', confFilePath, 'create', '-f', manifestFilePath],
-              logStream: ctx.logStream,
+              args: [
+                '--kubeconfig',
+                confFilePath,
+                'create',
+                '-f',
+                manifestFilePath,
+              ],
+              logger: ctx.logger,
             });
           } else {
             await executeShellCommand({
               command: 'kubectl',
-              args: ['--kubeconfig', confFilePath, 'apply', '-f', manifestFilePath],
-              logStream: ctx.logStream,
+              args: [
+                '--kubeconfig',
+                confFilePath,
+                'apply',
+                '-f',
+                manifestFilePath,
+              ],
+              logger: ctx.logger,
             });
           }
           counter += 1;
@@ -215,13 +212,13 @@ export const createKubernetesApply = (config: Config, actionId = 'cnoe:kubernete
           await executeShellCommand({
             command: 'kubectl',
             args: ['create', '-f', manifestFilePath],
-            logStream: ctx.logStream,
+            logger: ctx.logger,
           });
         } else {
           await executeShellCommand({
             command: 'kubectl',
             args: ['apply', '-f', manifestFilePath],
-            logStream: ctx.logStream,
+            logger: ctx.logger,
           });
         }
         counter += 1;

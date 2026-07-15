@@ -1,4 +1,3 @@
-import { Config } from '@backstage/config';
 import { KroErrorHandler } from './kro-error-handler';
 import { KroAuditLogger, KroAuditEventType } from './kro-audit';
 

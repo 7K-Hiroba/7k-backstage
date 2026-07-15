@@ -1,37 +1,15 @@
 import { createTemplateAction } from '@backstage/plugin-scaffolder-node';
 import yaml from 'js-yaml';
 
-type SanitizeResourceInput = {
-  document: string;
-};
-
-type SanitizeResourceOutput = {
-  sanitized: string;
-};
-
 export const createSanitizeResource = () => {
-  return createTemplateAction<SanitizeResourceInput, SanitizeResourceOutput>({
+  return createTemplateAction({
     id: 'cnoe:utils:sanitize',
     schema: {
       input: {
-        type: 'object',
-        required: ['document'],
-        properties: {
-          document: {
-            type: 'string',
-            title: 'Document',
-            description: 'The document to be sanitized',
-          },
-        },
+        document: z => z.string().describe('The document to be sanitized'),
       },
       output: {
-        type: 'object',
-        properties: {
-          sanitized: {
-            type: 'string',
-            description: 'The sanitized yaml string',
-          },
-        },
+        sanitized: z => z.string().describe('The sanitized yaml string'),
       },
     },
     async handler(ctx) {
