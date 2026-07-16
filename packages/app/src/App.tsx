@@ -1,4 +1,3 @@
-
 import { Navigate, Route } from 'react-router-dom';
 import { apiDocsPlugin } from '@backstage/plugin-api-docs';
 import {
@@ -42,6 +41,8 @@ import { cnoeVibrantLightAppTheme, cnoeVibrantDarkAppTheme } from './theme';
 import { Homepage } from './components/home/Homepage';
 import { CustomApiExplorerPage } from './components/api/ApiExplorerPage';
 import { EntityKindPicker } from '@backstage/plugin-catalog-react';
+import { ChatAssistantPage } from '@backstage-community/plugin-agent-forge';
+import { useFeatureFlags } from './hooks/useFeatureFlags';
 
 const app = createApp({
   apis,
@@ -88,7 +89,14 @@ const routes = (
   <FlatRoutes>
     <Route path="/" element={<Navigate to="home" />} />
     <Route path="/home" element={<Homepage />} />
-    <Route path="/catalog" element={<CatalogIndexPage filters={<EntityKindPicker initialFilter="component" hidden />} />} />
+    <Route
+      path="/catalog"
+      element={
+        <CatalogIndexPage
+          filters={<EntityKindPicker initialFilter="component" hidden />}
+        />
+      }
+    />
     <Route
       path="/catalog/:namespace/:kind/:name"
       element={<CatalogEntityPage />}
@@ -127,12 +135,18 @@ const routes = (
   </FlatRoutes>
 );
 
+const AgentForgeAssistant = () => {
+  const flags = useFeatureFlags();
+  return flags.agentForge ? <ChatAssistantPage /> : null;
+};
+
 export default app.createRoot(
   <>
     <AlertDisplay />
     <OAuthRequestDialog />
     <AppRouter>
       <Root>{routes}</Root>
+      <AgentForgeAssistant />
     </AppRouter>
   </>,
 );

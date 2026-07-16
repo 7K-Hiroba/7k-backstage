@@ -9,6 +9,44 @@ app:
 organization:
   name: CNOE
 
+# Per-client feature flags (frontend). All default to true when unset.
+# Override per client in an app-config overlay (e.g. app-config.client-a.yaml)
+# or via env vars, e.g. APP_CONFIG_features__techRadar=false
+#   search:        /search page + sidebar search
+#   apiDocs:       /api-docs page, sidebar APIs, entity API tabs
+#   techDocs:      /docs pages, sidebar Docs, entity Docs tabs
+#   scaffolder:    /create pages + sidebar Create
+#   techRadar:     /tech-radar page + sidebar item
+#   catalogGraph:  /catalog-graph page, sidebar Graph, entity graph cards
+#   catalogImport: /catalog-import page
+#   kubernetes:    entity Kubernetes tabs
+#   kro:           entity Kro tabs/cards
+#   argoWorkflows: entity CI/CD tab (Argo Workflows)
+#   argocd:        entity overview Argo CD card
+#   agentForge:    CAIPE Agent Forge chat assistant (requires agentForge.baseUrl)
+# NOTE: backend plugins are gated separately via FEATURE_* env vars
+# (FEATURE_TECHDOCS, FEATURE_SCAFFOLDER, FEATURE_SEARCH, FEATURE_KUBERNETES,
+# FEATURE_KRO) — set them to false alongside the matching flags here.
+features:
+  search: true
+  apiDocs: true
+  techDocs: true
+  scaffolder: true
+  techRadar: true
+  catalogGraph: true
+  catalogImport: true
+  kubernetes: true
+  kro: true
+  argoWorkflows: true
+  argocd: true
+  agentForge: true
+
+# CAIPE Agent Forge (AI chat assistant) — points to a running CAIPE instance.
+# See https://github.com/cnoe-io/ai-platform-engineering for deployment options.
+agentForge:
+  baseUrl: http://127.0.0.1:8000
+  # showOptions: true # display pre-defined options based on agent skills
+
 homepage:
   quickLinks:
     - url: /catalog

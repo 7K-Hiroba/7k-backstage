@@ -28,6 +28,7 @@ import {
   SidebarExpandButton,
 } from '@backstage/core-components';
 import { MyGroupsSidebarItem } from '@backstage/plugin-org';
+import { useFeatureFlags } from '../../hooks/useFeatureFlags';
 
 const sidebarLogoStyles = {
   root: {
@@ -63,72 +64,100 @@ const SidebarLogo = () => {
   );
 };
 
-export const Root = ({ children }: PropsWithChildren<{}>) => (
-  <SidebarPage>
-    <Sidebar>
-      {/* Logo */}
-      <SidebarLogo />
+export const Root = ({ children }: PropsWithChildren<{}>) => {
+  const flags = useFeatureFlags();
 
-      {/* Search — uses SidebarGroup so it aligns with other items */}
-      <SidebarGroup label="Search" icon={<SearchIcon />} to="/search">
-        <SidebarSearchModal />
-      </SidebarGroup>
+  return (
+    <SidebarPage>
+      <Sidebar>
+        {/* Logo */}
+        <SidebarLogo />
 
-      <SidebarDivider />
+        {/* Search — uses SidebarGroup so it aligns with other items */}
+        {flags.search && (
+          <SidebarGroup label="Search" icon={<SearchIcon />} to="/search">
+            <SidebarSearchModal />
+          </SidebarGroup>
+        )}
 
-      {/* Main navigation */}
-      <SidebarGroup label="Menu" icon={<MenuIcon />}>
-        <SidebarItem icon={HomeIcon} to="catalog" text="Catalog" />
-        <MyGroupsSidebarItem
-          singularTitle="My Group"
-          pluralTitle="My Groups"
-          icon={GroupIcon}
-        />
-        <SidebarItem icon={ExtensionIcon} to="api-docs" text="APIs" />
-        <SidebarItem icon={LibraryBooks} to="docs" text="Docs" />
-        <SidebarItem icon={CreateComponentIcon} to="create" text="Create..." />
         <SidebarDivider />
-        <span
-          style={{
-            fontSize: 10,
-            textTransform: 'uppercase',
-            letterSpacing: 1.5,
-            opacity: 0.5,
-            padding: '16px 24px 4px',
-            display: 'block',
+
+        {/* Main navigation */}
+        <SidebarGroup label="Menu" icon={<MenuIcon />}>
+          <SidebarItem icon={HomeIcon} to="catalog" text="Catalog" />
+          <MyGroupsSidebarItem
+            singularTitle="My Group"
+            pluralTitle="My Groups"
+            icon={GroupIcon}
+          />
+          {flags.apiDocs && (
+            <SidebarItem icon={ExtensionIcon} to="api-docs" text="APIs" />
+          )}
+          {flags.techDocs && (
+            <SidebarItem icon={LibraryBooks} to="docs" text="Docs" />
+          )}
+          {flags.scaffolder && (
+            <SidebarItem
+              icon={CreateComponentIcon}
+              to="create"
+              text="Create..."
+            />
+          )}
+          <SidebarDivider />
+          <span
+            style={{
+              fontSize: 10,
+              textTransform: 'uppercase',
+              letterSpacing: 1.5,
+              opacity: 0.5,
+              padding: '16px 24px 4px',
+              display: 'block',
+            }}
+          >
+            Tools
+          </span>
+          <SidebarScrollWrapper>
+            {flags.techRadar && (
+              <SidebarItem icon={MapIcon} to="tech-radar" text="Tech Radar" />
+            )}
+            {flags.catalogGraph && (
+              <SidebarItem
+                icon={CategoryIcon}
+                to="catalog-graph"
+                text="Graph"
+              />
+            )}
+          </SidebarScrollWrapper>
+        </SidebarGroup>
+
+        <SidebarSpace />
+        <SidebarDivider />
+
+        {/* Collapse toggle */}
+        <div
+          style={{ opacity: 0.6, transition: 'opacity 0.2s' }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLDivElement).style.opacity = '1';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLDivElement).style.opacity = '0.6';
           }}
         >
-          Tools
-        </span>
-        <SidebarScrollWrapper>
-          <SidebarItem icon={MapIcon} to="tech-radar" text="Tech Radar" />
-          <SidebarItem icon={CategoryIcon} to="catalog-graph" text="Graph" />
-        </SidebarScrollWrapper>
-      </SidebarGroup>
+          <SidebarExpandButton />
+        </div>
 
-      <SidebarSpace />
-      <SidebarDivider />
-
-      {/* Collapse toggle */}
-      <div
-        style={{ opacity: 0.6, transition: 'opacity 0.2s' }}
-        onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.opacity = '1'; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.opacity = '0.6'; }}
-      >
-        <SidebarExpandButton />
-      </div>
-
-      {/* Settings at bottom */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-        <SidebarGroup
-          label="Settings"
-          icon={<UserSettingsSignInAvatar />}
-          to="/settings"
-        >
-          <SidebarSettings />
-        </SidebarGroup>
-      </div>
-    </Sidebar>
-    {children}
-  </SidebarPage>
-);
+        {/* Settings at bottom */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          <SidebarGroup
+            label="Settings"
+            icon={<UserSettingsSignInAvatar />}
+            to="/settings"
+          >
+            <SidebarSettings />
+          </SidebarGroup>
+        </div>
+      </Sidebar>
+      {children}
+    </SidebarPage>
+  );
+};
