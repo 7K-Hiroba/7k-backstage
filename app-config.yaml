@@ -9,9 +9,17 @@ app:
 organization:
   name: CNOE
 
-# Per-client feature flags (frontend). All default to true when unset.
-# Override per client in an app-config overlay (e.g. app-config.client-a.yaml)
-# or via env vars, e.g. APP_CONFIG_features__techRadar=false
+# Per-client feature flags. All default to true when unset.
+# Both frontend UI and backend plugin registration read from `features.*`,
+# so a single flag disables the feature end-to-end.
+#
+# Override via:
+#   - An app-config overlay (highest precedence), or
+#   - Env vars using Backstage substitution, e.g. FEATURE_KRO=false.
+#     The value is JSON-parsed; use plain booleans, not quoted strings.
+#   - APP_CONFIG_* env vars, e.g. APP_CONFIG_features_techRadar=false
+#     (single underscore; the value is JSON-parsed).
+#
 #   search:        /search page + sidebar search
 #   apiDocs:       /api-docs page, sidebar APIs, entity API tabs
 #   techDocs:      /docs pages, sidebar Docs, entity Docs tabs
@@ -24,22 +32,19 @@ organization:
 #   argoWorkflows: entity CI/CD tab (Argo Workflows)
 #   argocd:        entity overview Argo CD card
 #   agentForge:    CAIPE Agent Forge chat assistant (requires agentForge.baseUrl)
-# NOTE: backend plugins are gated separately via FEATURE_* env vars
-# (FEATURE_TECHDOCS, FEATURE_SCAFFOLDER, FEATURE_SEARCH, FEATURE_KUBERNETES,
-# FEATURE_KRO) — set them to false alongside the matching flags here.
 features:
-  search: true
-  apiDocs: true
-  techDocs: true
-  scaffolder: true
-  techRadar: true
-  catalogGraph: true
-  catalogImport: true
-  kubernetes: true
-  kro: true
-  argoWorkflows: true
-  argocd: true
-  agentForge: true
+  search: ${FEATURE_SEARCH:-true}
+  apiDocs: ${FEATURE_API_DOCS:-true}
+  techDocs: ${FEATURE_TECHDOCS:-true}
+  scaffolder: ${FEATURE_SCAFFOLDER:-true}
+  techRadar: ${FEATURE_TECH_RADAR:-true}
+  catalogGraph: ${FEATURE_CATALOG_GRAPH:-true}
+  catalogImport: ${FEATURE_CATALOG_IMPORT:-true}
+  kubernetes: ${FEATURE_KUBERNETES:-true}
+  kro: ${FEATURE_KRO:-true}
+  argoWorkflows: ${FEATURE_ARGO_WORKFLOWS:-true}
+  argocd: ${FEATURE_ARGOCD:-true}
+  agentForge: ${FEATURE_AGENT_FORGE:-true}
 
 # CAIPE Agent Forge (AI chat assistant) — points to a running CAIPE instance.
 # See https://github.com/cnoe-io/ai-platform-engineering for deployment options.

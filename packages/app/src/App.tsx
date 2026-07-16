@@ -42,7 +42,19 @@ import { Homepage } from './components/home/Homepage';
 import { CustomApiExplorerPage } from './components/api/ApiExplorerPage';
 import { EntityKindPicker } from '@backstage/plugin-catalog-react';
 import { ChatAssistantPage } from '@backstage-community/plugin-agent-forge';
-import { useFeatureFlags } from './hooks/useFeatureFlags';
+import { useFeatureFlags, type FeatureFlag } from './hooks/useFeatureFlags';
+import type { ReactNode } from 'react';
+
+const FeatureGate = ({
+  flag,
+  children,
+}: {
+  flag: FeatureFlag;
+  children: ReactNode;
+}) => {
+  const flags = useFeatureFlags();
+  return flags[flag] ? <>{children}</> : null;
+};
 
 const app = createApp({
   apis,
@@ -103,35 +115,87 @@ const routes = (
     >
       {entityPage}
     </Route>
-    <Route path="/docs" element={<TechDocsIndexPage />} />
+    <Route
+      path="/docs"
+      element={
+        <FeatureGate flag="techDocs">
+          <TechDocsIndexPage />
+        </FeatureGate>
+      }
+    />
     <Route
       path="/docs/:namespace/:kind/:name/*"
-      element={<TechDocsReaderPage />}
-    >
-      <TechDocsAddons>
-        <ReportIssue />
-      </TechDocsAddons>
-    </Route>
-    <Route path="/create" element={<CustomScaffolderPage />} />
-    <Route path="/create/templates" element={<ScaffolderPage />} />
-    <Route path="/api-docs" element={<CustomApiExplorerPage />} />
+      element={
+        <FeatureGate flag="techDocs">
+          <TechDocsReaderPage>
+            <TechDocsAddons>
+              <ReportIssue />
+            </TechDocsAddons>
+          </TechDocsReaderPage>
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/create"
+      element={
+        <FeatureGate flag="scaffolder">
+          <CustomScaffolderPage />
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/create/templates"
+      element={
+        <FeatureGate flag="scaffolder">
+          <ScaffolderPage />
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/api-docs"
+      element={
+        <FeatureGate flag="apiDocs">
+          <CustomApiExplorerPage />
+        </FeatureGate>
+      }
+    />
     <Route
       path="/tech-radar"
-      element={<TechRadarPage width={1500} height={800} />}
+      element={
+        <FeatureGate flag="techRadar">
+          <TechRadarPage width={1500} height={800} />
+        </FeatureGate>
+      }
     />
     <Route
       path="/catalog-import"
       element={
-        <RequirePermission permission={catalogEntityCreatePermission}>
-          <CatalogImportPage />
-        </RequirePermission>
+        <FeatureGate flag="catalogImport">
+          <RequirePermission permission={catalogEntityCreatePermission}>
+            <CatalogImportPage />
+          </RequirePermission>
+        </FeatureGate>
       }
     />
-    <Route path="/search" element={<SearchPage />}>
+    <Route
+      path="/search"
+      element={
+        <FeatureGate flag="search">
+          <SearchPage />
+        </FeatureGate>
+      }
+    >
       {searchPage}
     </Route>
     <Route path="/settings" element={<UserSettingsPage />} />
-    <Route path="/catalog-graph" element={<CatalogGraphPage />} />
+    <Route
+      path="/catalog-graph"
+      element={
+        <FeatureGate flag="catalogGraph">
+          <CatalogGraphPage />
+        </FeatureGate>
+      }
+    />
   </FlatRoutes>
 );
 
