@@ -23,7 +23,7 @@ import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 import { UserSettingsPage } from '@backstage/plugin-user-settings';
 import { apis, oidcAuthApiRef } from './apis';
-import { EntityPageContent } from './components/catalog/EntityPage';
+import { entityPage } from './components/catalog/EntityPage';
 import { searchPage } from './components/search/SearchPage';
 import { Root } from './components/Root';
 import {
@@ -41,8 +41,8 @@ import { cnoeVibrantLightAppTheme, cnoeVibrantDarkAppTheme } from './theme';
 import { Homepage } from './components/home/Homepage';
 import { CustomApiExplorerPage } from './components/api/ApiExplorerPage';
 import { EntityKindPicker } from '@backstage/plugin-catalog-react';
-import { useFeatureFlags } from './hooks/useFeatureFlags';
 import { ChatAssistantPage } from '@backstage-community/plugin-agent-forge';
+import { useFeatureFlags } from './hooks/useFeatureFlags';
 
 const app = createApp({
   apis,
@@ -85,75 +85,55 @@ const app = createApp({
   },
 });
 
-const AppRoutes = () => {
-  const flags = useFeatureFlags();
-
-  return (
-    <FlatRoutes>
-      <Route path="/" element={<Navigate to="home" />} />
-      <Route path="/home" element={<Homepage />} />
-      <Route
-        path="/catalog"
-        element={
-          <CatalogIndexPage
-            filters={<EntityKindPicker initialFilter="component" hidden />}
-          />
-        }
-      />
-      <Route
-        path="/catalog/:namespace/:kind/:name"
-        element={<CatalogEntityPage />}
-      >
-        <EntityPageContent />
-      </Route>
-      {flags.techDocs && <Route path="/docs" element={<TechDocsIndexPage />} />}
-      {flags.techDocs && (
-        <Route
-          path="/docs/:namespace/:kind/:name/*"
-          element={<TechDocsReaderPage />}
-        >
-          <TechDocsAddons>
-            <ReportIssue />
-          </TechDocsAddons>
-        </Route>
-      )}
-      {flags.scaffolder && (
-        <Route path="/create" element={<CustomScaffolderPage />} />
-      )}
-      {flags.scaffolder && (
-        <Route path="/create/templates" element={<ScaffolderPage />} />
-      )}
-      {flags.apiDocs && (
-        <Route path="/api-docs" element={<CustomApiExplorerPage />} />
-      )}
-      {flags.techRadar && (
-        <Route
-          path="/tech-radar"
-          element={<TechRadarPage width={1500} height={800} />}
+const routes = (
+  <FlatRoutes>
+    <Route path="/" element={<Navigate to="home" />} />
+    <Route path="/home" element={<Homepage />} />
+    <Route
+      path="/catalog"
+      element={
+        <CatalogIndexPage
+          filters={<EntityKindPicker initialFilter="component" hidden />}
         />
-      )}
-      {flags.catalogImport && (
-        <Route
-          path="/catalog-import"
-          element={
-            <RequirePermission permission={catalogEntityCreatePermission}>
-              <CatalogImportPage />
-            </RequirePermission>
-          }
-        />
-      )}
-      {flags.search && (
-        <Route path="/search" element={<SearchPage />}>
-          {searchPage}
-        </Route>
-      )}
-      <Route path="/settings" element={<UserSettingsPage />} />
-      {flags.catalogGraph && (
-        <Route path="/catalog-graph" element={<CatalogGraphPage />} />
-      )}
-    </FlatRoutes>
-  );
-};
+      }
+    />
+    <Route
+      path="/catalog/:namespace/:kind/:name"
+      element={<CatalogEntityPage />}
+    >
+      {entityPage}
+    </Route>
+    <Route path="/docs" element={<TechDocsIndexPage />} />
+    <Route
+      path="/docs/:namespace/:kind/:name/*"
+      element={<TechDocsReaderPage />}
+    >
+      <TechDocsAddons>
+        <ReportIssue />
+      </TechDocsAddons>
+    </Route>
+    <Route path="/create" element={<CustomScaffolderPage />} />
+    <Route path="/create/templates" element={<ScaffolderPage />} />
+    <Route path="/api-docs" element={<CustomApiExplorerPage />} />
+    <Route
+      path="/tech-radar"
+      element={<TechRadarPage width={1500} height={800} />}
+    />
+    <Route
+      path="/catalog-import"
+      element={
+        <RequirePermission permission={catalogEntityCreatePermission}>
+          <CatalogImportPage />
+        </RequirePermission>
+      }
+    />
+    <Route path="/search" element={<SearchPage />}>
+      {searchPage}
+    </Route>
+    <Route path="/settings" element={<UserSettingsPage />} />
+    <Route path="/catalog-graph" element={<CatalogGraphPage />} />
+  </FlatRoutes>
+);
 
 const AgentForgeAssistant = () => {
   const flags = useFeatureFlags();
@@ -165,9 +145,7 @@ export default app.createRoot(
     <AlertDisplay />
     <OAuthRequestDialog />
     <AppRouter>
-      <Root>
-        <AppRoutes />
-      </Root>
+      <Root>{routes}</Root>
       <AgentForgeAssistant />
     </AppRouter>
   </>,

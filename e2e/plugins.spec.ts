@@ -1,11 +1,28 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
+
+async function waitForBackend(page: Page) {
+  for (let i = 0; i < 60; i++) {
+    try {
+      const response = await page.request.get(
+        'http://localhost:7007/api/app/health',
+      );
+      if (response.ok()) return;
+    } catch {
+      // Backend may still be starting; retry.
+    }
+    await page.waitForTimeout(1000);
+  }
+  throw new Error('Backend did not become ready in time');
+}
 
 test.describe('CNOE Backstage Plugin Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Dismiss webpack dev server overlay that intercepts clicks
     await page.addInitScript(() => {
       window.addEventListener('load', () => {
-        const overlay = document.getElementById('webpack-dev-server-client-overlay');
+        const overlay = document.getElementById(
+          'webpack-dev-server-client-overlay',
+        );
         if (overlay) overlay.remove();
       });
     });
@@ -14,8 +31,10 @@ test.describe('CNOE Backstage Plugin Tests', () => {
     await page.evaluate(() => {
       document.getElementById('webpack-dev-server-client-overlay')?.remove();
     });
+    // Ensure the backend is fully up before attempting guest sign-in.
+    await waitForBackend(page);
     const enterBtn = page.getByRole('button', { name: 'Enter' });
-    if (await enterBtn.isVisible({ timeout: 10000 }).catch(() => false)) {
+    if (await enterBtn.isVisible({ timeout: 30000 }).catch(() => false)) {
       await enterBtn.click({ force: true });
       await page.waitForURL('**/home', { timeout: 30000 });
     }
@@ -23,14 +42,18 @@ test.describe('CNOE Backstage Plugin Tests', () => {
 
   test('homepage loads with quick links', async ({ page }) => {
     await page.goto('/home');
-    await expect(page.getByText('Internal Developer Platform')).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText('Internal Developer Platform')).toBeVisible({
+      timeout: 30000,
+    });
     await expect(page.getByText('Quick Links')).toBeVisible();
     await expect(page.getByText('Starred Entities')).toBeVisible();
   });
 
   test('catalog page loads', async ({ page }) => {
     await page.goto('/catalog');
-    await expect(page.getByText('CNOE Catalog')).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText('CNOE Catalog')).toBeVisible({
+      timeout: 30000,
+    });
   });
 
   test('entity page shows plugin tabs', async ({ page }) => {
@@ -38,7 +61,9 @@ test.describe('CNOE Backstage Plugin Tests', () => {
     await page.goto('/catalog/default/component/platform-api-service');
 
     // Wait for entity page to load
-    await expect(page.getByText('platform-api-service')).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText('platform-api-service')).toBeVisible({
+      timeout: 30000,
+    });
 
     // Check that plugin tabs are visible
     await expect(page.getByRole('tab', { name: 'Overview' })).toBeVisible();
@@ -50,7 +75,9 @@ test.describe('CNOE Backstage Plugin Tests', () => {
 
   test('Apache Spark tab renders', async ({ page }) => {
     await page.goto('/catalog/default/component/platform-api-service');
-    await expect(page.getByText('platform-api-service')).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText('platform-api-service')).toBeVisible({
+      timeout: 30000,
+    });
 
     // Click Apache Spark tab
     const sparkTab = page.getByRole('tab', { name: 'Apache Spark' });
@@ -59,31 +86,41 @@ test.describe('CNOE Backstage Plugin Tests', () => {
       // Should show the spark overview table (may show error if mock not working, but tab should render)
       await page.waitForTimeout(2000);
       // Verify no crash - page should still be functional
-      await expect(page.locator('body')).not.toContainText('Something went wrong');
+      await expect(page.locator('body')).not.toContainText(
+        'Something went wrong',
+      );
     }
   });
 
   test('Argo Workflows tab renders', async ({ page }) => {
     await page.goto('/catalog/default/component/platform-api-service');
-    await expect(page.getByText('platform-api-service')).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText('platform-api-service')).toBeVisible({
+      timeout: 30000,
+    });
 
     const argoTab = page.getByRole('tab', { name: 'Argo Workflows' });
     if (await argoTab.isVisible()) {
       await argoTab.click();
       await page.waitForTimeout(2000);
-      await expect(page.locator('body')).not.toContainText('Something went wrong');
+      await expect(page.locator('body')).not.toContainText(
+        'Something went wrong',
+      );
     }
   });
 
   test('Terraform tab renders', async ({ page }) => {
     await page.goto('/catalog/default/component/platform-api-service');
-    await expect(page.getByText('platform-api-service')).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText('platform-api-service')).toBeVisible({
+      timeout: 30000,
+    });
 
     const tfTab = page.getByRole('tab', { name: 'Terraform' });
     if (await tfTab.isVisible()) {
       await tfTab.click();
       await page.waitForTimeout(2000);
-      await expect(page.locator('body')).not.toContainText('Something went wrong');
+      await expect(page.locator('body')).not.toContainText(
+        'Something went wrong',
+      );
     }
   });
 
@@ -94,7 +131,9 @@ test.describe('CNOE Backstage Plugin Tests', () => {
     });
 
     await page.goto('/catalog/default/component/platform-api-service');
-    await expect(page.getByText('platform-api-service')).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText('platform-api-service')).toBeVisible({
+      timeout: 30000,
+    });
 
     const unexpectedErrors = errors.filter(
       e =>
@@ -112,7 +151,9 @@ test.describe('CNOE Backstage Plugin Tests', () => {
   test('settings page shows theme switcher', async ({ page }) => {
     await page.goto('/settings');
     await expect(page.getByText('Appearance')).toBeVisible({ timeout: 30000 });
-    await expect(page.getByRole('button', { name: 'CNOE Light' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'CNOE Light' }),
+    ).toBeVisible();
     await expect(page.getByRole('button', { name: 'CNOE Dark' })).toBeVisible();
   });
 });
