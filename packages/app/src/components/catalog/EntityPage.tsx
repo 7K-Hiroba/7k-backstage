@@ -87,6 +87,9 @@ import {
   isArgocdAvailable,
 } from '@roadiehq/backstage-plugin-argo-cd';
 
+import { type FeatureFlags } from '../../hooks/useFeatureFlags';
+import { useFeatureFlags } from '../../hooks/useFeatureFlags';
+
 // CSS grid layout helpers (replaces MUI Grid)
 const grid12: CSSProperties = {
   display: 'grid',
@@ -217,32 +220,6 @@ const entityWarningContent = (
   </>
 );
 
-const overviewContent = (
-  <div style={grid12}>
-    <EntityMetadataBar />
-    {entityWarningContent}
-    <div style={span(6)}>
-      <EntityAboutCard />
-    </div>
-    <div style={span(6)}>
-      <EntityCatalogGraphCard height={400} />
-    </div>
-    <EntitySwitch>
-      <EntitySwitch.Case if={isArgocdAvailable}>
-        <div style={span(12)}>
-          <EntityArgoCDOverviewCard />
-        </div>
-      </EntitySwitch.Case>
-    </EntitySwitch>
-    <div style={span(4)}>
-      <EntityLinksCard />
-    </div>
-    <div style={span(8)}>
-      <EntityHasSubcomponentsCard />
-    </div>
-  </div>
-);
-
 const kubernetesContent = <EntityKubernetesContent />;
 
 const kroDetailsContent = (
@@ -271,91 +248,151 @@ const dependenciesContent = (
   </div>
 );
 
-const serviceEntityPage = (
-  <EntityLayout>
-    <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
-      {overviewContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/ci-cd"
-      title={tabLabel(<RocketLaunch />, 'CI/CD')}
-    >
-      {cicdContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/kubernetes"
-      title={tabLabel(<Cloud />, 'Kubernetes')}
-      if={isKubernetesAvailable}
-    >
-      {kubernetesContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/kro"
-      title={tabLabel(<AccountTree />, 'Kro Details')}
-      if={isKroAvailable}
-    >
-      {kroDetailsContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route path="/api" title={tabLabel(<Api />, 'API')}>
-      <div style={grid12}>
-        <div style={span(6)}>
-          <EntityProvidedApisCard />
-        </div>
-        <div style={span(6)}>
-          <EntityConsumedApisCard />
-        </div>
+const overviewContent = (flags: FeatureFlags) => (
+  <div style={grid12}>
+    <EntityMetadataBar />
+    {entityWarningContent}
+    <div style={span(6)}>
+      <EntityAboutCard />
+    </div>
+    {flags.catalogGraph && (
+      <div style={span(6)}>
+        <EntityCatalogGraphCard height={400} />
       </div>
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/dependencies"
-      title={tabLabel(<Hub />, 'Dependencies')}
-    >
-      {dependenciesContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route path="/docs" title={tabLabel(<Description />, 'Docs')}>
-      {techdocsContent}
-    </EntityLayout.Route>
-  </EntityLayout>
+    )}
+    {flags.argocd && (
+      <EntitySwitch>
+        <EntitySwitch.Case if={isArgocdAvailable}>
+          <div style={span(12)}>
+            <EntityArgoCDOverviewCard />
+          </div>
+        </EntitySwitch.Case>
+      </EntitySwitch>
+    )}
+    <div style={span(4)}>
+      <EntityLinksCard />
+    </div>
+    <div style={span(8)}>
+      <EntityHasSubcomponentsCard />
+    </div>
+  </div>
 );
 
-const websiteEntityPage = (
+const catalogGraphCard = (height: number = 400) => (
+  <div style={span(6)}>
+    <EntityCatalogGraphCard height={height} />
+  </div>
+);
+
+const serviceEntityPage = (flags: FeatureFlags) => (
   <EntityLayout>
     <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
-      {overviewContent}
+      {overviewContent(flags)}
     </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/ci-cd"
-      title={tabLabel(<RocketLaunch />, 'CI/CD')}
-    >
-      {cicdContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/kubernetes"
-      title={tabLabel(<Cloud />, 'Kubernetes')}
-      if={isKubernetesAvailable}
-    >
-      {kubernetesContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/kro"
-      title={tabLabel(<AccountTree />, 'Kro Details')}
-      if={isKroAvailable}
-    >
-      {kroDetailsContent}
-    </EntityLayout.Route>
+    {flags.argoWorkflows && (
+      <EntityLayout.Route
+        path="/ci-cd"
+        title={tabLabel(<RocketLaunch />, 'CI/CD')}
+      >
+        {cicdContent}
+      </EntityLayout.Route>
+    )}
+    {flags.kubernetes && (
+      <EntityLayout.Route
+        path="/kubernetes"
+        title={tabLabel(<Cloud />, 'Kubernetes')}
+        if={isKubernetesAvailable}
+      >
+        {kubernetesContent}
+      </EntityLayout.Route>
+    )}
+    {flags.kro && (
+      <EntityLayout.Route
+        path="/kro"
+        title={tabLabel(<AccountTree />, 'Kro Details')}
+        if={isKroAvailable}
+      >
+        {kroDetailsContent}
+      </EntityLayout.Route>
+    )}
+    {flags.apiDocs && (
+      <EntityLayout.Route path="/api" title={tabLabel(<Api />, 'API')}>
+        <div style={grid12}>
+          <div style={span(6)}>
+            <EntityProvidedApisCard />
+          </div>
+          <div style={span(6)}>
+            <EntityConsumedApisCard />
+          </div>
+        </div>
+      </EntityLayout.Route>
+    )}
     <EntityLayout.Route
       path="/dependencies"
       title={tabLabel(<Hub />, 'Dependencies')}
     >
       {dependenciesContent}
     </EntityLayout.Route>
-    <EntityLayout.Route path="/docs" title={tabLabel(<Description />, 'Docs')}>
-      {techdocsContent}
-    </EntityLayout.Route>
+    {flags.techDocs && (
+      <EntityLayout.Route
+        path="/docs"
+        title={tabLabel(<Description />, 'Docs')}
+      >
+        {techdocsContent}
+      </EntityLayout.Route>
+    )}
   </EntityLayout>
 );
 
-const resourceGroupPage = (
+const websiteEntityPage = (flags: FeatureFlags) => (
+  <EntityLayout>
+    <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
+      {overviewContent(flags)}
+    </EntityLayout.Route>
+    {flags.argoWorkflows && (
+      <EntityLayout.Route
+        path="/ci-cd"
+        title={tabLabel(<RocketLaunch />, 'CI/CD')}
+      >
+        {cicdContent}
+      </EntityLayout.Route>
+    )}
+    {flags.kubernetes && (
+      <EntityLayout.Route
+        path="/kubernetes"
+        title={tabLabel(<Cloud />, 'Kubernetes')}
+        if={isKubernetesAvailable}
+      >
+        {kubernetesContent}
+      </EntityLayout.Route>
+    )}
+    {flags.kro && (
+      <EntityLayout.Route
+        path="/kro"
+        title={tabLabel(<AccountTree />, 'Kro Details')}
+        if={isKroAvailable}
+      >
+        {kroDetailsContent}
+      </EntityLayout.Route>
+    )}
+    <EntityLayout.Route
+      path="/dependencies"
+      title={tabLabel(<Hub />, 'Dependencies')}
+    >
+      {dependenciesContent}
+    </EntityLayout.Route>
+    {flags.techDocs && (
+      <EntityLayout.Route
+        path="/docs"
+        title={tabLabel(<Description />, 'Docs')}
+      >
+        {techdocsContent}
+      </EntityLayout.Route>
+    )}
+  </EntityLayout>
+);
+
+const resourceGroupPage = (flags: FeatureFlags) => (
   <EntityLayout>
     <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
       <div style={grid12}>
@@ -363,69 +400,83 @@ const resourceGroupPage = (
         <div style={span(6)}>
           <EntityAboutCard />
         </div>
-        <div style={span(6)}>
-          <EntityCatalogGraphCard height={400} />
-        </div>
+        {flags.catalogGraph && catalogGraphCard()}
         <div style={span(4)}>
           <EntityLinksCard />
         </div>
-        <div style={span(8)}>
-          <IfKroOverviewAvailable>
-            <KroOverviewCard />
-          </IfKroOverviewAvailable>
-        </div>
+        {flags.kro && (
+          <div style={span(8)}>
+            <IfKroOverviewAvailable>
+              <KroOverviewCard />
+            </IfKroOverviewAvailable>
+          </div>
+        )}
       </div>
     </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/kro"
-      title={tabLabel(<AccountTree />, 'Kro Details')}
-      if={isKroAvailable}
-    >
-      {kroDetailsContent}
-    </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/kubernetes"
-      title={tabLabel(<Cloud />, 'Kubernetes')}
-      if={isKubernetesAvailable}
-    >
-      <EntityKubernetesContent />
-    </EntityLayout.Route>
+    {flags.kro && (
+      <EntityLayout.Route
+        path="/kro"
+        title={tabLabel(<AccountTree />, 'Kro Details')}
+        if={isKroAvailable}
+      >
+        {kroDetailsContent}
+      </EntityLayout.Route>
+    )}
+    {flags.kubernetes && (
+      <EntityLayout.Route
+        path="/kubernetes"
+        title={tabLabel(<Cloud />, 'Kubernetes')}
+        if={isKubernetesAvailable}
+      >
+        <EntityKubernetesContent />
+      </EntityLayout.Route>
+    )}
     <EntityLayout.Route
       path="/dependencies"
       title={tabLabel(<Hub />, 'Dependencies')}
     >
       {dependenciesContent}
     </EntityLayout.Route>
-    <EntityLayout.Route path="/docs" title={tabLabel(<Description />, 'Docs')}>
-      {techdocsContent}
-    </EntityLayout.Route>
+    {flags.techDocs && (
+      <EntityLayout.Route
+        path="/docs"
+        title={tabLabel(<Description />, 'Docs')}
+      >
+        {techdocsContent}
+      </EntityLayout.Route>
+    )}
   </EntityLayout>
 );
 
-const defaultEntityPage = (
+const defaultEntityPage = (flags: FeatureFlags) => (
   <EntityLayout>
     <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
-      {overviewContent}
+      {overviewContent(flags)}
     </EntityLayout.Route>
-    <EntityLayout.Route path="/docs" title={tabLabel(<Description />, 'Docs')}>
-      {techdocsContent}
-    </EntityLayout.Route>
+    {flags.techDocs && (
+      <EntityLayout.Route
+        path="/docs"
+        title={tabLabel(<Description />, 'Docs')}
+      >
+        {techdocsContent}
+      </EntityLayout.Route>
+    )}
   </EntityLayout>
 );
 
-const componentPage = (
+const componentPage = (flags: FeatureFlags) => (
   <EntitySwitch>
     <EntitySwitch.Case if={isComponentType('service')}>
-      {serviceEntityPage}
+      {serviceEntityPage(flags)}
     </EntitySwitch.Case>
     <EntitySwitch.Case if={isComponentType('website')}>
-      {websiteEntityPage}
+      {websiteEntityPage(flags)}
     </EntitySwitch.Case>
-    <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
+    <EntitySwitch.Case>{defaultEntityPage(flags)}</EntitySwitch.Case>
   </EntitySwitch>
 );
 
-const apiPage = (
+const apiPage = (flags: FeatureFlags) => (
   <EntityLayout>
     <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
       <div style={grid12}>
@@ -433,9 +484,7 @@ const apiPage = (
         <div style={span(6)}>
           <EntityAboutCard />
         </div>
-        <div style={span(6)}>
-          <EntityCatalogGraphCard height={400} />
-        </div>
+        {flags.catalogGraph && catalogGraphCard()}
         <div style={span(4)}>
           <EntityLinksCard />
         </div>
@@ -498,7 +547,7 @@ const groupPage = (
   </EntityLayout>
 );
 
-const systemPage = (
+const systemPage = (flags: FeatureFlags) => (
   <EntityLayout>
     <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
       <div style={grid12}>
@@ -506,48 +555,50 @@ const systemPage = (
         <div style={span(6)}>
           <EntityAboutCard />
         </div>
-        <div style={span(6)}>
-          <EntityCatalogGraphCard height={400} />
-        </div>
+        {flags.catalogGraph && catalogGraphCard()}
         <div style={span(4)}>
           <EntityLinksCard />
         </div>
         <div style={span(8)}>
           <EntityHasComponentsCard />
         </div>
-        <div style={span(6)}>
-          <EntityHasApisCard />
-        </div>
+        {flags.apiDocs && (
+          <div style={span(6)}>
+            <EntityHasApisCard />
+          </div>
+        )}
         <div style={span(6)}>
           <EntityHasResourcesCard />
         </div>
       </div>
     </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/diagram"
-      title={tabLabel(<GridView />, 'Diagram')}
-    >
-      <EntityCatalogGraphCard
-        direction={Direction.TOP_BOTTOM}
-        title="System Diagram"
-        height={700}
-        relations={[
-          RELATION_PART_OF,
-          RELATION_HAS_PART,
-          RELATION_API_CONSUMED_BY,
-          RELATION_API_PROVIDED_BY,
-          RELATION_CONSUMES_API,
-          RELATION_PROVIDES_API,
-          RELATION_DEPENDENCY_OF,
-          RELATION_DEPENDS_ON,
-        ]}
-        unidirectional={false}
-      />
-    </EntityLayout.Route>
+    {flags.catalogGraph && (
+      <EntityLayout.Route
+        path="/diagram"
+        title={tabLabel(<GridView />, 'Diagram')}
+      >
+        <EntityCatalogGraphCard
+          direction={Direction.TOP_BOTTOM}
+          title="System Diagram"
+          height={700}
+          relations={[
+            RELATION_PART_OF,
+            RELATION_HAS_PART,
+            RELATION_API_CONSUMED_BY,
+            RELATION_API_PROVIDED_BY,
+            RELATION_CONSUMES_API,
+            RELATION_PROVIDES_API,
+            RELATION_DEPENDENCY_OF,
+            RELATION_DEPENDS_ON,
+          ]}
+          unidirectional={false}
+        />
+      </EntityLayout.Route>
+    )}
   </EntityLayout>
 );
 
-const domainPage = (
+const domainPage = (flags: FeatureFlags) => (
   <EntityLayout>
     <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
       <div style={grid12}>
@@ -555,9 +606,7 @@ const domainPage = (
         <div style={span(6)}>
           <EntityAboutCard />
         </div>
-        <div style={span(6)}>
-          <EntityCatalogGraphCard height={400} />
-        </div>
+        {flags.catalogGraph && catalogGraphCard()}
         <div style={span(6)}>
           <EntityHasSystemsCard />
         </div>
@@ -566,18 +615,25 @@ const domainPage = (
   </EntityLayout>
 );
 
-export const entityPage = (
-  <EntitySwitch>
-    <EntitySwitch.Case if={isKind('component')} children={componentPage} />
-    <EntitySwitch.Case if={isKind('api')} children={apiPage} />
-    <EntitySwitch.Case if={isKind('group')} children={groupPage} />
-    <EntitySwitch.Case if={isKind('user')} children={userPage} />
-    <EntitySwitch.Case if={isKind('system')} children={systemPage} />
-    <EntitySwitch.Case if={isKind('domain')} children={domainPage} />
-    <EntitySwitch.Case
-      if={isKind('resourcegroup')}
-      children={resourceGroupPage}
-    />
-    <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
-  </EntitySwitch>
-);
+export const EntityPageContent = () => {
+  const flags = useFeatureFlags();
+
+  return (
+    <EntitySwitch>
+      <EntitySwitch.Case
+        if={isKind('component')}
+        children={componentPage(flags)}
+      />
+      <EntitySwitch.Case if={isKind('api')} children={apiPage(flags)} />
+      <EntitySwitch.Case if={isKind('group')} children={groupPage} />
+      <EntitySwitch.Case if={isKind('user')} children={userPage} />
+      <EntitySwitch.Case if={isKind('system')} children={systemPage(flags)} />
+      <EntitySwitch.Case if={isKind('domain')} children={domainPage(flags)} />
+      <EntitySwitch.Case
+        if={isKind('resourcegroup')}
+        children={resourceGroupPage(flags)}
+      />
+      <EntitySwitch.Case>{defaultEntityPage(flags)}</EntitySwitch.Case>
+    </EntitySwitch>
+  );
+};

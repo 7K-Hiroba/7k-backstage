@@ -5,12 +5,19 @@ import { cnoeScaffolderActions } from './modules/scaffolder';
 
 const backend = createBackend();
 
+// Per-client feature flags for backend plugins. Set FEATURE_<NAME>=false in
+// the deployment environment to disable a plugin (defaults to enabled).
+// Frontend equivalents live under `features.*` in app-config.
+const featureEnabled = (name: string) =>
+  process.env[`FEATURE_${name}`] !== 'false';
+
 // Detect if running inside a Kubernetes cluster
 const isInCluster = require('fs').existsSync(
   '/var/run/secrets/kubernetes.io/serviceaccount/token',
 );
 
-const k8sEnabled = process.env.K8S_CLUSTER_URL || isInCluster;
+const k8sEnabled =
+  (process.env.K8S_CLUSTER_URL || isInCluster) && featureEnabled('KUBERNETES');
 
 // Core plugins
 backend.add(import('@backstage/plugin-app-backend'));
@@ -19,27 +26,31 @@ if (process.env.MOCK_MODE === 'true') {
 } else {
   backend.add(import('@backstage/plugin-proxy-backend'));
 }
-backend.add(import('@backstage/plugin-techdocs-backend'));
-
-// Scaffolder
-backend.add(import('@backstage/plugin-scaffolder-backend'));
-backend.add(
-  import('@backstage/plugin-catalog-backend-module-scaffolder-entity-model'),
-);
-
-// Scaffolder modules that require external services — skip if not configured
-if (process.env.GITHUB_TOKEN) {
-  backend.add(import('@backstage/plugin-scaffolder-backend-module-github'));
+if (featureEnabled('TECHDOCS')) {
+  backend.add(import('@backstage/plugin-techdocs-backend'));
 }
 
-// CNOE custom scaffolder actions (gitea publish, argocd, k8s-apply, sanitize, verify)
-backend.add(cnoeScaffolderActions);
+// Scaffolder
+if (featureEnabled('SCAFFOLDER')) {
+  backend.add(import('@backstage/plugin-scaffolder-backend'));
+  backend.add(
+    import('@backstage/plugin-catalog-backend-module-scaffolder-entity-model'),
+  );
 
-// Roadie scaffolder modules
-backend.add(import('@roadiehq/scaffolder-backend-module-utils'));
-backend.add(import('@roadiehq/scaffolder-backend-module-http-request'));
-if (k8sEnabled) {
-  backend.add(import('@roadiehq/scaffolder-backend-argocd'));
+  // Scaffolder modules that require external services — skip if not configured
+  if (process.env.GITHUB_TOKEN) {
+    backend.add(import('@backstage/plugin-scaffolder-backend-module-github'));
+  }
+
+  // CNOE custom scaffolder actions (gitea publish, argocd, k8s-apply, sanitize, verify)
+  backend.add(cnoeScaffolderActions);
+
+  // Roadie scaffolder modules
+  backend.add(import('@roadiehq/scaffolder-backend-module-utils'));
+  backend.add(import('@roadiehq/scaffolder-backend-module-http-request'));
+  if (k8sEnabled) {
+    backend.add(import('@roadiehq/scaffolder-backend-argocd'));
+  }
 }
 
 // Auth
@@ -56,9 +67,11 @@ backend.add(
 );
 
 // Search
-backend.add(import('@backstage/plugin-search-backend'));
-backend.add(import('@backstage/plugin-search-backend-module-catalog'));
-backend.add(import('@backstage/plugin-search-backend-module-techdocs/alpha'));
+if (featureEnabled('SEARCH')) {
+  backend.add(import('@backstage/plugin-search-backend'));
+  backend.add(import('@backstage/plugin-search-backend-module-catalog'));
+  backend.add(import('@backstage/plugin-search-backend-module-techdocs/alpha'));
+}
 
 // Kubernetes
 if (process.env.MOCK_MODE === 'true') {
@@ -66,7 +79,9 @@ if (process.env.MOCK_MODE === 'true') {
 } else if (k8sEnabled) {
   backend.add(import('@backstage/plugin-kubernetes-backend'));
   backend.add(import('@terasky/backstage-plugin-kubernetes-ingestor'));
-  backend.add(import('@terasky/backstage-plugin-kro-resources-backend'));
+  if (featureEnabled('KRO')) {
+    backend.add(import('@terasky/backstage-plugin-kro-resources-backend'));
+  }
 }
 
 // Keycloak OIDC auth
