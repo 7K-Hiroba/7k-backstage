@@ -42,7 +42,19 @@ import { Homepage } from './components/home/Homepage';
 import { CustomApiExplorerPage } from './components/api/ApiExplorerPage';
 import { EntityKindPicker } from '@backstage/plugin-catalog-react';
 import { ChatAssistantPage } from '@backstage-community/plugin-agent-forge';
-import { useFeatureFlags } from './hooks/useFeatureFlags';
+import { useFeatureFlags, type FeatureFlag } from './hooks/useFeatureFlags';
+import type { ReactNode } from 'react';
+
+const FeatureGate = ({
+  flag,
+  children,
+}: {
+  flag: FeatureFlag;
+  children: ReactNode;
+}) => {
+  const flags = useFeatureFlags();
+  return flags[flag] ? <>{children}</> : null;
+};
 
 const app = createApp({
   apis,
@@ -85,76 +97,107 @@ const app = createApp({
   },
 });
 
-const Routes = () => {
-  const flags = useFeatureFlags();
-  return (
-    <FlatRoutes>
-      <Route path="/" element={<Navigate to="home" />} />
-      <Route path="/home" element={<Homepage />} />
-      <Route
-        path="/catalog"
-        element={
-          <CatalogIndexPage
-            filters={<EntityKindPicker initialFilter="component" hidden />}
-          />
-        }
-      />
-      <Route
-        path="/catalog/:namespace/:kind/:name"
-        element={<CatalogEntityPage />}
-      >
-        {entityPage}
-      </Route>
-      {flags.techDocs && (
-        <>
-          <Route path="/docs" element={<TechDocsIndexPage />} />
-          <Route
-            path="/docs/:namespace/:kind/:name/*"
-            element={<TechDocsReaderPage />}
-          >
+const routes = (
+  <FlatRoutes>
+    <Route path="/" element={<Navigate to="home" />} />
+    <Route path="/home" element={<Homepage />} />
+    <Route
+      path="/catalog"
+      element={
+        <CatalogIndexPage
+          filters={<EntityKindPicker initialFilter="component" hidden />}
+        />
+      }
+    />
+    <Route
+      path="/catalog/:namespace/:kind/:name"
+      element={<CatalogEntityPage />}
+    >
+      {entityPage}
+    </Route>
+    <Route
+      path="/docs"
+      element={
+        <FeatureGate flag="techDocs">
+          <TechDocsIndexPage />
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/docs/:namespace/:kind/:name/*"
+      element={
+        <FeatureGate flag="techDocs">
+          <TechDocsReaderPage>
             <TechDocsAddons>
               <ReportIssue />
             </TechDocsAddons>
-          </Route>
-        </>
-      )}
-      {flags.scaffolder && (
-        <>
-          <Route path="/create" element={<CustomScaffolderPage />} />
-          <Route path="/create/templates" element={<ScaffolderPage />} />
-        </>
-      )}
-      {flags.apiDocs && (
-        <Route path="/api-docs" element={<CustomApiExplorerPage />} />
-      )}
-      {flags.techRadar && (
-        <Route
-          path="/tech-radar"
-          element={<TechRadarPage width={1500} height={800} />}
-        />
-      )}
-      {flags.catalogImport && (
-        <Route
-          path="/catalog-import"
-          element={
-            <RequirePermission permission={catalogEntityCreatePermission}>
-              <CatalogImportPage />
-            </RequirePermission>
-          }
-        />
-      )}
-      {flags.search && (
-        <Route path="/search" element={<SearchPage />}>
-          {searchPage}
-        </Route>
-      )}
-      <Route path="/settings" element={<UserSettingsPage />} />
-      {flags.catalogGraph && (
-        <Route path="/catalog-graph" element={<CatalogGraphPage />} />
-      )}
-    </FlatRoutes>
-  );
-};
+          </TechDocsReaderPage>
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/create"
+      element={
+        <FeatureGate flag="scaffolder">
+          <CustomScaffolderPage />
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/create/templates"
+      element={
+        <FeatureGate flag="scaffolder">
+          <ScaffolderPage />
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/api-docs"
+      element={
+        <FeatureGate flag="apiDocs">
+          <CustomApiExplorerPage />
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/tech-radar"
+      element={
+        <FeatureGate flag="techRadar">
+          <TechRadarPage width={1500} height={800} />
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/catalog-import"
+      element={
+        <FeatureGate flag="catalogImport">
+          <RequirePermission permission={catalogEntityCreatePermission}>
+            <CatalogImportPage />
+          </RequirePermission>
+        </FeatureGate>
+      }
+    />
+    <Route
+      path="/search"
+      element={
+        <FeatureGate flag="search">
+          <SearchPage />
+        </FeatureGate>
+      }
+    >
+      {searchPage}
+    </Route>
+    <Route path="/settings" element={<UserSettingsPage />} />
+    <Route
+      path="/catalog-graph"
+      element={
+        <FeatureGate flag="catalogGraph">
+          <CatalogGraphPage />
+        </FeatureGate>
+      }
+    />
+  </FlatRoutes>
+);
 
 const AgentForgeAssistant = () => {
   const flags = useFeatureFlags();
@@ -166,9 +209,7 @@ export default app.createRoot(
     <AlertDisplay />
     <OAuthRequestDialog />
     <AppRouter>
-      <Root>
-        <Routes />
-      </Root>
+      <Root>{routes}</Root>
       <AgentForgeAssistant />
     </AppRouter>
   </>,
