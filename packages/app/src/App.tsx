@@ -42,7 +42,7 @@ import { Homepage } from './components/home/Homepage';
 import { CustomApiExplorerPage } from './components/api/ApiExplorerPage';
 import { EntityKindPicker } from '@backstage/plugin-catalog-react';
 import { ChatAssistantPage } from '@backstage-community/plugin-agent-forge';
-import { useFeatureFlags, type FeatureFlag } from './hooks/useFeatureFlags';
+import { useFeatureFlags, initFeatureFlags, type FeatureFlag } from './hooks/useFeatureFlags';
 import type { ReactNode } from 'react';
 
 const FeatureGate = ({
@@ -204,10 +204,17 @@ const AgentForgeAssistant = () => {
   return flags.agentForge ? <ChatAssistantPage /> : null;
 };
 
+const FeatureFlagsInitializer = () => {
+  const configApi = useApi(configApiRef);
+  initFeatureFlags(configApi);
+  return null;
+};
+
 export default app.createRoot(
   <>
     <AlertDisplay />
     <OAuthRequestDialog />
+    <FeatureFlagsInitializer />
     <AppRouter>
       <Root>{routes}</Root>
       <AgentForgeAssistant />

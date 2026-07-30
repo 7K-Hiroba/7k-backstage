@@ -64,7 +64,7 @@ import {
 } from '@backstage/catalog-model';
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
-import { useFeatureFlags } from '../../hooks/useFeatureFlags';
+import { useFeatureFlags, getFeatureFlagsSync } from '../../hooks/useFeatureFlags';
 
 import {
   EntityKubernetesContent,
@@ -282,141 +282,138 @@ const dependenciesContent = (
   </div>
 );
 
-const ServiceEntityPage = () => {
-  const flags = useFeatureFlags();
-  return (
-    <EntityLayout>
-      <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
-        <OverviewContent />
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/ci-cd"
-        title={tabLabel(<RocketLaunch />, 'CI/CD')}
-      >
-        <CicdContent />
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/kubernetes"
-        title={tabLabel(<Cloud />, 'Kubernetes')}
-        if={e => flags.kubernetes && isKubernetesAvailable(e)}
-      >
-        {kubernetesContent}
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/kro"
-        title={tabLabel(<AccountTree />, 'Kro Details')}
-        if={e => flags.kro && isKroAvailable(e)}
-      >
-        {kroDetailsContent}
-      </EntityLayout.Route>
-      <EntityLayout.Route path="/api" title={tabLabel(<Api />, 'API')}>
-        <div style={grid12}>
-          <div style={span(6)}>
-            <EntityProvidedApisCard />
-          </div>
-          <div style={span(6)}>
-            <EntityConsumedApisCard />
-          </div>
+const ServiceEntityPage = (
+  <EntityLayout>
+    <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
+      <OverviewContent />
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/ci-cd"
+      title={tabLabel(<RocketLaunch />, 'CI/CD')}
+    >
+      <CicdContent />
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/kubernetes"
+      title={tabLabel(<Cloud />, 'Kubernetes')}
+      if={e => getFeatureFlagsSync().kubernetes && isKubernetesAvailable(e)}
+    >
+      {kubernetesContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/kro"
+      title={tabLabel(<AccountTree />, 'Kro Details')}
+      if={e => getFeatureFlagsSync().kro && isKroAvailable(e)}
+    >
+      {kroDetailsContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route path="/api" title={tabLabel(<Api />, 'API')}>
+      <div style={grid12}>
+        <div style={span(6)}>
+          <EntityProvidedApisCard />
         </div>
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/dependencies"
-        title={tabLabel(<Hub />, 'Dependencies')}
-      >
-        {dependenciesContent}
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/docs"
-        title={tabLabel(<Description />, 'Docs')}
-      >
-        {techdocsContent}
-      </EntityLayout.Route>
-    </EntityLayout>
-  );
-};
-
-const WebsiteEntityPage = () => {
-  const flags = useFeatureFlags();
-  return (
-    <EntityLayout>
-      <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
-        <OverviewContent />
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/ci-cd"
-        title={tabLabel(<RocketLaunch />, 'CI/CD')}
-      >
-        <CicdContent />
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/kubernetes"
-        title={tabLabel(<Cloud />, 'Kubernetes')}
-        if={e => flags.kubernetes && isKubernetesAvailable(e)}
-      >
-        {kubernetesContent}
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/kro"
-        title={tabLabel(<AccountTree />, 'Kro Details')}
-        if={e => flags.kro && isKroAvailable(e)}
-      >
-        {kroDetailsContent}
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/dependencies"
-        title={tabLabel(<Hub />, 'Dependencies')}
-      >
-        {dependenciesContent}
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/docs"
-        title={tabLabel(<Description />, 'Docs')}
-      >
-        {techdocsContent}
-      </EntityLayout.Route>
-    </EntityLayout>
-  );
-};
-
-const ResourceGroupPage = () => {
-  const flags = useFeatureFlags();
-  return (
-    <EntityLayout>
-      <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
-        <div style={grid12}>
-          {entityWarningContent}
-          <div style={span(6)}>
-            <EntityAboutCard />
-          </div>
-          <div style={span(6)}>
-            <EntityCatalogGraphCard height={400} />
-          </div>
-          <div style={span(4)}>
-            <EntityLinksCard />
-          </div>
-          {flags.kro && (
-            <div style={span(8)}>
-              <IfKroOverviewAvailable>
-                <KroOverviewCard />
-              </IfKroOverviewAvailable>
-            </div>
-          )}
+        <div style={span(6)}>
+          <EntityConsumedApisCard />
         </div>
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/kro"
-        title={tabLabel(<AccountTree />, 'Kro Details')}
-        if={e => flags.kro && isKroAvailable(e)}
-      >
-        {kroDetailsContent}
-      </EntityLayout.Route>
-      <EntityLayout.Route
-        path="/kubernetes"
-        title={tabLabel(<Cloud />, 'Kubernetes')}
-        if={e => flags.kubernetes && isKubernetesAvailable(e)}
-      >
-        <EntityKubernetesContent />
-      </EntityLayout.Route>
+      </div>
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/dependencies"
+      title={tabLabel(<Hub />, 'Dependencies')}
+    >
+      {dependenciesContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/docs"
+      title={tabLabel(<Description />, 'Docs')}
+    >
+      {techdocsContent}
+    </EntityLayout.Route>
+  </EntityLayout>
+);
+
+const WebsiteEntityPage = (
+  <EntityLayout>
+    <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
+      <OverviewContent />
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/ci-cd"
+      title={tabLabel(<RocketLaunch />, 'CI/CD')}
+    >
+      <CicdContent />
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/kubernetes"
+      title={tabLabel(<Cloud />, 'Kubernetes')}
+      if={e => getFeatureFlagsSync().kubernetes && isKubernetesAvailable(e)}
+    >
+      {kubernetesContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/kro"
+      title={tabLabel(<AccountTree />, 'Kro Details')}
+      if={e => getFeatureFlagsSync().kro && isKroAvailable(e)}
+    >
+      {kroDetailsContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/dependencies"
+      title={tabLabel(<Hub />, 'Dependencies')}
+    >
+      {dependenciesContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/docs"
+      title={tabLabel(<Description />, 'Docs')}
+    >
+      {techdocsContent}
+    </EntityLayout.Route>
+  </EntityLayout>
+);
+
+const KroOverviewSection = () => {
+  const flags = useFeatureFlags();
+  return flags.kro ? (
+    <div style={span(8)}>
+      <IfKroOverviewAvailable>
+        <KroOverviewCard />
+      </IfKroOverviewAvailable>
+    </div>
+  ) : null;
+};
+
+const ResourceGroupPage = (
+  <EntityLayout>
+    <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
+      <div style={grid12}>
+        {entityWarningContent}
+        <div style={span(6)}>
+          <EntityAboutCard />
+        </div>
+        <div style={span(6)}>
+          <EntityCatalogGraphCard height={400} />
+        </div>
+        <div style={span(4)}>
+          <EntityLinksCard />
+        </div>
+        <KroOverviewSection />
+      </div>
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/kro"
+      title={tabLabel(<AccountTree />, 'Kro Details')}
+      if={e => getFeatureFlagsSync().kro && isKroAvailable(e)}
+    >
+      {kroDetailsContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/kubernetes"
+      title={tabLabel(<Cloud />, 'Kubernetes')}
+      if={e => getFeatureFlagsSync().kubernetes && isKubernetesAvailable(e)}
+    >
+      <EntityKubernetesContent />
+    </EntityLayout.Route>
       <EntityLayout.Route
         path="/dependencies"
         title={tabLabel(<Hub />, 'Dependencies')}
@@ -430,10 +427,9 @@ const ResourceGroupPage = () => {
         {techdocsContent}
       </EntityLayout.Route>
     </EntityLayout>
-  );
-};
+);
 
-const DefaultEntityPage = () => (
+const DefaultEntityPage = (
   <EntityLayout>
     <EntityLayout.Route path="/" title={tabLabel(<Dashboard />, 'Overview')}>
       <OverviewContent />
@@ -444,16 +440,16 @@ const DefaultEntityPage = () => (
   </EntityLayout>
 );
 
-const ComponentPage = () => (
+const ComponentPage = (
   <EntitySwitch>
     <EntitySwitch.Case if={isComponentType('service')}>
-      <ServiceEntityPage />
+      {ServiceEntityPage}
     </EntitySwitch.Case>
     <EntitySwitch.Case if={isComponentType('website')}>
-      <WebsiteEntityPage />
+      {WebsiteEntityPage}
     </EntitySwitch.Case>
     <EntitySwitch.Case>
-      <DefaultEntityPage />
+      {DefaultEntityPage}
     </EntitySwitch.Case>
   </EntitySwitch>
 );
@@ -602,7 +598,7 @@ const domainPage = (
 export const entityPage = (
   <EntitySwitch>
     <EntitySwitch.Case if={isKind('component')}>
-      <ComponentPage />
+      {ComponentPage}
     </EntitySwitch.Case>
     <EntitySwitch.Case if={isKind('api')} children={apiPage} />
     <EntitySwitch.Case if={isKind('group')} children={groupPage} />
@@ -610,10 +606,10 @@ export const entityPage = (
     <EntitySwitch.Case if={isKind('system')} children={systemPage} />
     <EntitySwitch.Case if={isKind('domain')} children={domainPage} />
     <EntitySwitch.Case if={isKind('resourcegroup')}>
-      <ResourceGroupPage />
+      {ResourceGroupPage}
     </EntitySwitch.Case>
     <EntitySwitch.Case>
-      <DefaultEntityPage />
+      {DefaultEntityPage}
     </EntitySwitch.Case>
   </EntitySwitch>
 );
