@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.ref }}"
+  group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: false
 
 permissions:
@@ -21,7 +21,7 @@ jobs:
 
   version:
     needs: release-please
-    if: ${{ fromJson(needs.release-please.outputs.releases_created || '{}')['.'] }}
+    if: ${{ needs.release-please.outputs.releases_created == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -35,7 +35,7 @@ jobs:
 
   publish:
     needs: [release-please, version]
-    if: ${{ fromJson(needs.release-please.outputs.releases_created || '{}')['.'] }}
+    if: ${{ needs.release-please.outputs.releases_created == 'true' }}
     permissions:
       contents: read
       id-token: write

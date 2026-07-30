@@ -1,6 +1,11 @@
 app:
   baseUrl: http://localhost:7007
 
+# Agent Forge is disabled in production: the plugin speaks the A2A protocol,
+# which requires the CAIPE supervisor removed in CAIPE chart 0.5.22+.
+features:
+  agentForge: false
+
 backend:
   baseUrl: http://localhost:7007
   listen: ':7007'

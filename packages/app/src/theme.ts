@@ -20,7 +20,10 @@ const cnoeTypography = {
 // All page types use the same CNOE blue gradient
 const cnoePageThemeLight = {
   home: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
-  documentation: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave2 }),
+  documentation: genPageTheme({
+    colors: ['#003D7A', '#1A8DFF'],
+    shape: shapes.wave2,
+  }),
   tool: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.round }),
   service: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
   website: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
@@ -28,19 +31,31 @@ const cnoePageThemeLight = {
   other: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
   app: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
   apis: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
-  component: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
-  resource: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
+  component: genPageTheme({
+    colors: ['#003D7A', '#1A8DFF'],
+    shape: shapes.wave,
+  }),
+  resource: genPageTheme({
+    colors: ['#003D7A', '#1A8DFF'],
+    shape: shapes.wave,
+  }),
   system: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
   domain: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
   group: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
   user: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
-  template: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
+  template: genPageTheme({
+    colors: ['#003D7A', '#1A8DFF'],
+    shape: shapes.wave,
+  }),
   card: genPageTheme({ colors: ['#003D7A', '#1A8DFF'], shape: shapes.wave }),
 };
 
 const cnoePageThemeDark = {
   home: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
-  documentation: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave2 }),
+  documentation: genPageTheme({
+    colors: ['#0D1117', '#003D68'],
+    shape: shapes.wave2,
+  }),
   tool: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.round }),
   service: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
   website: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
@@ -48,13 +63,22 @@ const cnoePageThemeDark = {
   other: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
   app: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
   apis: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
-  component: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
-  resource: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
+  component: genPageTheme({
+    colors: ['#0D1117', '#003D68'],
+    shape: shapes.wave,
+  }),
+  resource: genPageTheme({
+    colors: ['#0D1117', '#003D68'],
+    shape: shapes.wave,
+  }),
   system: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
   domain: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
   group: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
   user: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
-  template: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
+  template: genPageTheme({
+    colors: ['#0D1117', '#003D68'],
+    shape: shapes.wave,
+  }),
   card: genPageTheme({ colors: ['#0D1117', '#003D68'], shape: shapes.wave }),
 };
 
@@ -112,7 +136,8 @@ const lightTheme = createUnifiedTheme({
           backgroundImage: 'linear-gradient(180deg, #006AA8 0%, #00568C 100%)',
           '&:hover': {
             backgroundColor: '#004070',
-            backgroundImage: 'linear-gradient(180deg, #00568C 0%, #004070 100%)',
+            backgroundImage:
+              'linear-gradient(180deg, #00568C 0%, #004070 100%)',
             boxShadow: '0 4px 12px rgba(0,86,140,0.3)',
           },
         },
@@ -311,7 +336,8 @@ const darkTheme = createUnifiedTheme({
           color: '#0D1117',
           '&:hover': {
             backgroundColor: '#3A8FE0',
-            backgroundImage: 'linear-gradient(180deg, #4DA6FF 0%, #3A8FE0 100%)',
+            backgroundImage:
+              'linear-gradient(180deg, #4DA6FF 0%, #3A8FE0 100%)',
             boxShadow: '0 4px 12px rgba(77,166,255,0.3)',
           },
         },
@@ -465,7 +491,7 @@ const darkTheme = createUnifiedTheme({
 
 // AppTheme exports for legacy createApp from @backstage/app-defaults
 export const cnoeVibrantLightAppTheme: AppTheme = {
-  id: 'cnoe-light',
+  id: 'light',
   title: 'CNOE Light',
   variant: 'light',
   Provider: ({ children }) =>
@@ -473,7 +499,7 @@ export const cnoeVibrantLightAppTheme: AppTheme = {
 };
 
 export const cnoeVibrantDarkAppTheme: AppTheme = {
-  id: 'cnoe-dark',
+  id: 'dark',
   title: 'CNOE Dark',
   variant: 'dark',
   Provider: ({ children }) =>

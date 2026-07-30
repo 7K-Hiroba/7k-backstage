@@ -11,6 +11,8 @@ import {
   useEntityList,
 } from '@backstage/plugin-catalog-react';
 import { Entity } from '@backstage/catalog-model';
+import { useRouteRef } from '@backstage/core-plugin-api';
+import { scaffolderPlugin } from '@backstage/plugin-scaffolder';
 import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -147,10 +149,18 @@ const FilterDropdown = () => {
 const TemplateGrid = () => {
   const { entities, loading } = useEntityList();
   const navigate = useNavigate();
+  const selectedTemplateRoute = useRouteRef(
+    scaffolderPlugin.routes.selectedTemplate,
+  );
 
   if (loading) {
     return (
-      <Typography variant="body1" color="textSecondary" align="center" sx={{ py: 6 }}>
+      <Typography
+        variant="body1"
+        color="textSecondary"
+        align="center"
+        sx={{ py: 6 }}
+      >
         Loading templates...
       </Typography>
     );
@@ -160,14 +170,25 @@ const TemplateGrid = () => {
 
   if (!templates || templates.length === 0) {
     return (
-      <Typography variant="body1" color="textSecondary" align="center" sx={{ py: 6 }}>
+      <Typography
+        variant="body1"
+        color="textSecondary"
+        align="center"
+        sx={{ py: 6 }}
+      >
         No templates found matching your filters.
       </Typography>
     );
   }
 
   return (
-    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 3 }}>
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+        gap: 3,
+      }}
+    >
       {templates.map(template => {
         const name = template.metadata.name;
         const namespace = template.metadata.namespace ?? 'default';
@@ -197,7 +218,13 @@ const TemplateGrid = () => {
             <CardHeader
               title={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Chip label={type} size="small" color="primary" variant="outlined" sx={{ fontSize: 11 }} />
+                  <Chip
+                    label={type}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{ fontSize: 11 }}
+                  />
                   <Box sx={{ flex: 1 }} />
                   <IconButton size="small" aria-label="documentation">
                     <DescriptionIcon fontSize="small" />
@@ -210,21 +237,38 @@ const TemplateGrid = () => {
               sx={{ pb: 0 }}
             />
             <CardContent sx={{ flex: 1, pt: 1, px: 2.5 }}>
-              <Typography variant="h6" component="h3" gutterBottom sx={{ fontSize: '1rem', fontWeight: 700, lineHeight: 1.3 }}>
+              <Typography
+                variant="h6"
+                component="h3"
+                gutterBottom
+                sx={{ fontSize: '1rem', fontWeight: 700, lineHeight: 1.3 }}
+              >
                 {title}
               </Typography>
-              <Typography variant="body2" color="textSecondary" sx={{ mb: 2, lineHeight: 1.6 }}>
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                sx={{ mb: 2, lineHeight: 1.6 }}
+              >
                 {description}
               </Typography>
               {tags.length > 0 && (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {tags.map(tag => (
-                    <Chip key={tag} label={tag} size="small" variant="outlined" sx={{ fontSize: 11 }} />
+                    <Chip
+                      key={tag}
+                      label={tag}
+                      size="small"
+                      variant="outlined"
+                      sx={{ fontSize: 11 }}
+                    />
                   ))}
                 </Box>
               )}
             </CardContent>
-            <CardActions sx={{ justifyContent: 'space-between', px: 2.5, pb: 2 }}>
+            <CardActions
+              sx={{ justifyContent: 'space-between', px: 2.5, pb: 2 }}
+            >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <PersonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                 <Typography variant="caption" color="textSecondary">
@@ -235,7 +279,11 @@ const TemplateGrid = () => {
                 variant="contained"
                 size="small"
                 color="primary"
-                onClick={() => navigate(`/create/templates/${namespace}/${name}`)}
+                onClick={() =>
+                  navigate(
+                    selectedTemplateRoute({ namespace, templateName: name }),
+                  )
+                }
                 sx={{ borderRadius: 4, textTransform: 'none', fontWeight: 600 }}
               >
                 Choose
@@ -251,7 +299,10 @@ const TemplateGrid = () => {
 export const CustomScaffolderPage = () => {
   return (
     <Page themeId="tool">
-      <Header title="Create a new component" subtitle="Create new software components using standard templates in your organization" />
+      <Header
+        title="Create a new component"
+        subtitle="Create new software components using standard templates in your organization"
+      />
       <Content>
         <EntityListProvider>
           <EntityKindPicker initialFilter="template" hidden />
