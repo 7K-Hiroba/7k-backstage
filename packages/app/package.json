@@ -57,7 +57,7 @@
     "msw": "^1.3.5",
     "react": "^18.0.2",
     "react-dom": "^18.0.2",
-    "react-router-dom": "^6.3.0"
+    "react-router-dom": "^7.0.0"
   },
   "devDependencies": {
     "@backstage/test-utils": "^1.7.20",
