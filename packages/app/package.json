@@ -50,7 +50,7 @@
     "@backstage/theme": "^0.7.3",
     "@backstage/ui": "^0.17.0",
     "@internal/plugin-argo-workflows": "^0.1.0",
-    "@mui/icons-material": "^5.0.0",
+    "@mui/icons-material": "^9.0.0",
     "@mui/material": "^9.0.0",
     "@roadiehq/backstage-plugin-argo-cd": "^2.12.5",
     "@terasky/backstage-plugin-kro-resources-frontend": "^0.16.1",
