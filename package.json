@@ -46,7 +46,7 @@
   },
   "resolutions": {
     "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react-dom": "^19.0.0",
     "isolated-vm": "5.0.4",
     "@mui/material": "^5.15.6",
     "react-router": "^6.30.2",
