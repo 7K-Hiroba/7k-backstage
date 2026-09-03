@@ -53,7 +53,7 @@
     "@terasky/backstage-plugin-kubernetes-ingestor": "^4.0.0",
     "app": "link:../app",
     "better-sqlite3": "^11.10.0",
-    "express": "^4.22.2",
+    "express": "^5.0.0",
     "express-promise-router": "^4.1.0",
     "fs-extra": "~11.2.0",
     "js-yaml": "^4.1.0",
@@ -63,7 +63,7 @@
   "devDependencies": {
     "@backstage/backend-test-utils": "^1.11.5",
     "@backstage/cli": "^0.36.4",
-    "@types/express": "^4.17.25",
+    "@types/express": "^5.0.0",
     "@types/fs-extra": "^11.0.4"
   },
   "files": [
