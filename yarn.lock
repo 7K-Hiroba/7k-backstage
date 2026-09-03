@@ -24479,9 +24479,7 @@ react-resizable@^3.0.4, react-resizable@^3.0.5:
     react-draggable "^4.0.3"
 
 react-router-dom@^6.3.0, react-router-dom@^6.30.2:
-  version "6.30.4"
-  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-6.30.4.tgz#f7167bf3da6c7d9132130ea985dd06def25e84d5"
-  integrity sha512-q4HvNl+mmDdkS0g+MqiBZNteQJCuimWoOyHMy4T/RQLAn9Z29+E91QXRaxOujeMl2HTzRSS0KFPd7lxX3PjV0Q==
+  version "6.30.5"
   dependencies:
     "@remix-run/router" "1.23.3"
     react-router "6.30.4"
