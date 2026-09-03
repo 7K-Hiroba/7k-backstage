@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "yarn@1.22.22",
   "engines": {
-    "node": "18 || 20 || 22"
+    "node": "18 || 20 || 22 || 24"
   },
   "scripts": {
     "dev": "HOST=0.0.0.0 concurrently \"yarn start\" \"yarn start-backend\"",
