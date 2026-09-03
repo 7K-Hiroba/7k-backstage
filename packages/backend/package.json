@@ -52,7 +52,7 @@
     "@terasky/backstage-plugin-kro-resources-backend": "^0.17.0",
     "@terasky/backstage-plugin-kubernetes-ingestor": "^4.0.0",
     "app": "link:../app",
-    "better-sqlite3": "^11.10.0",
+    "better-sqlite3": "^13.0.0",
     "express": "^4.22.2",
     "express-promise-router": "^4.1.0",
     "fs-extra": "~11.2.0",
